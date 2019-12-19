@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+(
+    rm -rf dist && mkdir -p dist
+    cd backend
+    # TODO: Requirements
+    zip ../dist/code.zip *
+)

@@ -1,50 +1,47 @@
- provider "aws" {
-   region = "us-west-1"
- }
+provider "aws" {
+  region = "eu-west-1"
+}
 
 variable "app_version" {
 }
 
- resource "aws_s3_bucket" "lambdaholder" {
+resource "aws_s3_bucket" "lambdaholder" {
   acl    = "private"
 }
 
- resource "aws_lambda_function" "namelambda" {
-   function_name = "ServerlessExample"
+resource "aws_lambda_function" "namelambda" {
+  function_name = "nafnaval-api-lambda"
+  # The bucket name as created earlier with "aws s3api create-bucket"
+  s3_bucket = "${aws_s3_bucket.lambdaholder.id}"
+  s3_key    = "${var.app_version}/code.zip"
+  # s3_bucket = "stack-helpers.irdn.is"
+  # s3_key = "code.zip"
+  # "main" is the filename within the zip file (main.js) and "handler"
+  # is the name of the property under which the handler function was
+  # exported in that file.
+  handler = "main.handler"
+  runtime = "python3.8"
+  role = aws_iam_role.lambda_exec.arn
+}
 
-   # The bucket name as created earlier with "aws s3api create-bucket"
-   s3_bucket = "${aws_s3_bucket.lambdaholder.id}"
-   s3_key    = "${var.app_version}/code.zip"
-
-   # "main" is the filename within the zip file (main.js) and "handler"
-   # is the name of the property under which the handler function was
-   # exported in that file.
-   handler = "main.handler"
-   runtime = "python3.8"
-
-   role = aws_iam_role.lambda_exec.arn
- }
-
- resource "aws_iam_role" "lambda_exec" {
-   name = "serverless_example_lambda"
-
-   assume_role_policy = <<EOF
- {
-   "Version": "2012-10-17",
-   "Statement": [
-     {
-       "Action": "sts:AssumeRole",
-       "Principal": {
-         "Service": "lambda.amazonaws.com"
-       },
-       "Effect": "Allow",
-       "Sid": ""
-     }
-   ]
- }
- EOF
-
- }
+resource "aws_iam_role" "lambda_exec" {
+  name = "serverless_example_lambda"
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "lambda.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
+}
 
 resource "aws_api_gateway_rest_api" "gateway" {
   name        = "ServerlessExample"
@@ -57,11 +54,64 @@ resource "aws_api_gateway_resource" "proxy" {
    path_part   = "{proxy+}"
 }
 
+resource "aws_api_gateway_method" "options_method" {
+    rest_api_id   = "${aws_api_gateway_rest_api.gateway.id}"
+    resource_id   = "${aws_api_gateway_resource.proxy.id}"
+    http_method   = "OPTIONS"
+    authorization = "NONE"
+}
+
+resource "aws_api_gateway_method_response" "options_200" {
+    rest_api_id   = "${aws_api_gateway_rest_api.gateway.id}"
+    resource_id   = "${aws_api_gateway_resource.proxy.id}"
+    http_method   = "${aws_api_gateway_method.options_method.http_method}"
+    status_code   = "200"
+    response_models = {
+        "application/json" = "Empty"
+    }
+    response_parameters = {
+        "method.response.header.Access-Control-Allow-Headers" = true,
+        "method.response.header.Access-Control-Allow-Methods" = true,
+        "method.response.header.Access-Control-Allow-Origin" = true
+    }
+    depends_on = ["aws_api_gateway_method.options_method"]
+}
+resource "aws_api_gateway_integration" "options_integration" {
+    rest_api_id   = "${aws_api_gateway_rest_api.gateway.id}"
+    resource_id   = "${aws_api_gateway_resource.proxy.id}"
+    http_method   = "${aws_api_gateway_method.options_method.http_method}"
+    type          = "MOCK"
+    depends_on = ["aws_api_gateway_method.options_method"]
+}
+resource "aws_api_gateway_integration_response" "options_integration_response" {
+    rest_api_id   = "${aws_api_gateway_rest_api.gateway.id}"
+    resource_id   = "${aws_api_gateway_resource.proxy.id}"
+    http_method   = "${aws_api_gateway_method.options_method.http_method}"
+    status_code   = "${aws_api_gateway_method_response.options_200.status_code}"
+    response_parameters = {
+        "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
+        "method.response.header.Access-Control-Allow-Methods" = "'GET,OPTIONS,POST,PUT'",
+        "method.response.header.Access-Control-Allow-Origin" = "'*'"
+    }
+    depends_on = ["aws_api_gateway_method_response.options_200"]
+}
+
 resource "aws_api_gateway_method" "proxy" {
    rest_api_id   = aws_api_gateway_rest_api.gateway.id
    resource_id   = aws_api_gateway_resource.proxy.id
    http_method   = "ANY"
    authorization = "NONE"
+}
+
+resource "aws_api_gateway_method_response" "cors_method_response_200" {
+    rest_api_id   = "${aws_api_gateway_rest_api.gateway.id}"
+    resource_id   = "${aws_api_gateway_resource.proxy.id}"
+    http_method   = "${aws_api_gateway_method.proxy.http_method}"
+    status_code   = "200"
+    response_parameters = {
+        "method.response.header.Access-Control-Allow-Origin" = true
+    }
+    depends_on = ["aws_api_gateway_method.proxy"]
 }
 
 resource "aws_api_gateway_integration" "lambda" {
@@ -114,4 +164,8 @@ resource "aws_lambda_permission" "apigw" {
 
 output "base_url" {
   value = aws_api_gateway_deployment.deployment.invoke_url
+}
+
+output "codebucket" {
+  value = aws_s3_bucket.lambdaholder.bucket
 }
