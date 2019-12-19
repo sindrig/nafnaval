@@ -22,10 +22,11 @@ resource "aws_lambda_function" "namelambda" {
   handler = "main.handler"
   runtime = "python3.8"
   role = aws_iam_role.lambda_exec.arn
+  depends_on    = ["aws_iam_role_policy_attachment.lambda_logs", "aws_cloudwatch_log_group.example"]
 }
 
 resource "aws_iam_role" "lambda_exec" {
-  name = "serverless_example_lambda"
+  name = "lambda-execution-role"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -41,6 +42,39 @@ resource "aws_iam_role" "lambda_exec" {
   ]
 }
 EOF
+}
+
+resource "aws_cloudwatch_log_group" "example" {
+  name              = "/aws/lambda/nafnaval-api-lambda"
+  retention_in_days = 14
+}
+
+resource "aws_iam_policy" "lambda_logging" {
+  name = "lambda_logging"
+  path = "/"
+  description = "IAM policy for logging from a lambda"
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+      ],
+      "Resource": "arn:aws:logs:*:*:*",
+      "Effect": "Allow"
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_logs" {
+  role = "${aws_iam_role.lambda_exec.name}"
+  policy_arn = "${aws_iam_policy.lambda_logging.arn}"
 }
 
 resource "aws_api_gateway_rest_api" "gateway" {
@@ -148,7 +182,7 @@ resource "aws_api_gateway_method" "proxy_root" {
    ]
 
    rest_api_id = aws_api_gateway_rest_api.gateway.id
-   stage_name  = "test"
+   stage_name  = "stage"
  }
 
 resource "aws_lambda_permission" "apigw" {
@@ -159,11 +193,15 @@ resource "aws_lambda_permission" "apigw" {
 
    # The "/*/*" portion grants access from any method on any resource
    # within the API Gateway REST API.
-   source_arn = "${aws_api_gateway_rest_api.gateway.execution_arn}/*/*"
+   source_arn = "${aws_api_gateway_rest_api.gateway.execution_arn}/*/*/*"
  }
 
 output "base_url" {
   value = aws_api_gateway_deployment.deployment.invoke_url
+}
+
+output "sindri" {
+  value = aws_api_gateway_rest_api.gateway.execution_arn
 }
 
 output "codebucket" {
