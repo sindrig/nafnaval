@@ -30,7 +30,6 @@ class StateHandler:
             'Counterpart',
             'Email',
         ]
-        return response(request.query)
         if 'selected' in request.query:
             attrs.append('Selected')
         elif 'rejected' in request.query:
