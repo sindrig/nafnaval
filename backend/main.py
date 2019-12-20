@@ -1,12 +1,9 @@
-import json
+from server.router import serve
 
 
 def handler(event, context):
-    responseMsg = {
-        'statusCode': '200',
-        'body': json.dumps(event),
-        'headers': {
-            'Access-Control-Allow-Origin': '*'
-        }
-    }
-    return responseMsg
+    return serve(
+        path=event.get('path', '').lstrip('/'),
+        method=event.get('httpMethod', '').lower(),
+        body=event.get('body'),
+    )

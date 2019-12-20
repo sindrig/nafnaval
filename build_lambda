@@ -3,6 +3,17 @@
 (
     rm -rf dist && mkdir -p dist
     cd backend
-    # TODO: Requirements
-    zip ../dist/code.zip *
+    if [ -d "venv" ]; then
+        echo "Have to clean virtual env"
+        rm -rf venv
+    fi
+    virtualenv venv
+    source venv/bin/activate
+    pip install -r requirements.txt
+    (
+         cd venv/lib/python3.8/site-packages
+         zip -r9 ${OLDPWD}/code.zip .
+    )
+    zip -gr code.zip main.py server
+    mv code.zip ../dist/code.zip
 )
