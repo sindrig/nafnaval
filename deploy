@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+set -e
+
+CODE_VERSION=`git log -1 --pretty=format:"%H"`
+CODE_BUCKET=`terraform output codebucket`
+if aws s3 ls s3://$CODE_BUCKET/$CODE_VERSION/code.zip; then
+    echo "Code exists on s3, skipping"
+else
+    aws s3 cp dist/code.zip s3://$CODE_BUCKET/$CODE_VERSION/code.zip
+fi
+terraform apply -var="app_version=$CODE_VERSION" -auto-approve
+
+FRONTEND_BUCKET=`terraform output frontendbucket`
+
+aws s3 sync frontend/build s3://$FRONTEND_BUCKET

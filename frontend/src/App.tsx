@@ -7,7 +7,6 @@ import {
 import { useTranslation } from 'react-i18next';
 import Selection from './Selection';
 import Signup from './Signup';
-import FlagIcon from './FlagIcon';
 import './App.css';
 
 const App: React.FC = () => {
@@ -16,8 +15,8 @@ const App: React.FC = () => {
       <Router>
         <div>
           <div className="language-selector">
-            <button onClick={() => i18n.changeLanguage('is')}><FlagIcon code="is" /></button>
-            <button onClick={() => i18n.changeLanguage('en')}><FlagIcon code="gb" /></button>
+            <button onClick={() => i18n.changeLanguage('is')}>is</button>
+            <button onClick={() => i18n.changeLanguage('en')}>en</button>
           </div>
           {/* A <Switch> looks through its children <Route>s and
               renders the first one that matches the current URL. */}

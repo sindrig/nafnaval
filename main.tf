@@ -443,3 +443,7 @@ output "names_table" {
 output "codebucket" {
   value = aws_s3_bucket.lambdaholder.bucket
 }
+
+output "frontendbucket" {
+  value = aws_s3_bucket.www.bucket
+}
