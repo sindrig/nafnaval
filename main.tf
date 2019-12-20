@@ -22,6 +22,14 @@ resource "aws_lambda_function" "namelambda" {
   handler = "main.handler"
   runtime = "python3.8"
   role = aws_iam_role.lambda_exec.arn
+
+  environment {
+    variables = {
+      NAMES_TABLE = aws_dynamodb_table.names.name
+      CONFIG_TABLE = aws_dynamodb_table.config.name
+    }
+  }
+
   depends_on    = [aws_iam_role_policy_attachment.lambda_logs, aws_cloudwatch_log_group.example]
 }
 

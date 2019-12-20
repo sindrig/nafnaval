@@ -29,11 +29,11 @@ def dynamodb():
             TableName=names_table,
             KeySchema=[
                 {'AttributeName': 'StateId', 'KeyType': 'HASH'},
-                {'AttributeName': 'Done', 'KeyType': 'RANGE'},
+                {'AttributeName': 'Name', 'KeyType': 'RANGE'},
             ],
             AttributeDefinitions=[
                 {'AttributeName': 'StateId', 'AttributeType': 'S'},
-                {'AttributeName': 'Done', 'AttributeType': 'N'},
+                {'AttributeName': 'Name', 'AttributeType': 'S'},
             ],
         )
         table.meta.client.get_waiter('table_exists').wait(

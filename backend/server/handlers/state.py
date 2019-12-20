@@ -78,6 +78,7 @@ class StateHandler:
     def _create_name(self, state_id, name):
         return {
             'StateId': state_id,
+            'Name': name,
             'Done': False,
             'Selected': False,
             'Created': int(time.time()),
