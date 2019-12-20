@@ -5,7 +5,6 @@ import re
 from urllib.parse import urljoin
 
 import boto3
-from boto3.dynamodb.conditions import Key, Attr
 
 from server.responses import response
 from server.exceptions import NotFound, BadInput

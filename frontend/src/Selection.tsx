@@ -20,14 +20,14 @@ class Selection extends React.Component<SelectionProps> {
     this.getNames = this.getNames.bind(this);
   }
 
-  private async getNames(e: React.MouseEvent<HTMLAnchorElement>) {
+  private async getNames(e: React.MouseEvent<HTMLButtonElement>) {
     e.preventDefault();
     await this.props.getNames(this.props.match.params.id);
   }
 
   render() {
     return (
-      <a onClick={this.getNames}>Get names</a>
+      <button onClick={this.getNames}>Get names</button>
     )
   }
 }

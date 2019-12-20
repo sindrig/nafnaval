@@ -2,7 +2,7 @@ import axios from 'axios';
 import { Name } from './store/names/types';
 
 // TODO: Pull from terraform
-const BASE_URL = 'https://9brd4bxwv9.execute-api.eu-west-1.amazonaws.com/stage/'
+const BASE_URL = process.env.REACT_APP_BASE_API_URL;
 
 const apiClient = axios.create({
   baseURL: BASE_URL,
