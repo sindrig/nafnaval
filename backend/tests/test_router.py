@@ -1,3 +1,4 @@
+import json
 from unittest.mock import patch, Mock
 
 from server.router import serve, Request
@@ -16,7 +17,9 @@ def test_not_found_handler(get_handler_patch):
     res = serve(path='state/', method='get')
 
     assert res['statusCode'] == 404
-    assert res['body'] == 'Could not find handler key "state"'
+    assert res['body'] == json.dumps(
+        {'error': 'Could not find handler key "state"'}
+    )
 
 
 @patch('server.router.get_handler')
@@ -29,7 +32,9 @@ def test_missing_method(get_handler_patch):
     res = serve(path='state/', method='get')
 
     assert res['statusCode'] == 405
-    assert res['body'] == f'Could not find "get" handler for "state" handler'
+    assert res['body'] == json.dumps(
+        {'error': f'Could not find "get" handler for "state" handler'}
+    )
 
 
 @patch('server.router.get_handler')
@@ -43,7 +48,7 @@ def test_malformed_body(get_handler_patch):
     res = serve(path='state/', method='get', body='{"invalid_json"')
 
     assert res['statusCode'] == 400
-    assert res['body'] == 'Could not decode body'
+    assert res['body'] == json.dumps({'error': 'Could not decode body'})
 
 
 @patch('server.router.get_handler')
@@ -59,5 +64,19 @@ def test_routes_correctly(get_handler_patch):
 
     assert res == expected
     handler().get.assert_called_once_with(
-        Request(path='rest/of/path', body={'encoded': 'body'})
+        Request(path='rest/of/path', body={'encoded': 'body'}, query={})
+    )
+
+
+@patch('server.router.get_handler')
+def test_gets_query(get_handler_patch):
+    handler = Mock()
+    get_handler_patch.return_value = handler
+
+    serve(path='state/rest?query=1&query=2&other=3', method='get', body=None)
+
+    handler().get.assert_called_once_with(
+        Request(
+            path='rest', body=None, query={'query': ['1', '2'], 'other': ['3']}
+        )
     )

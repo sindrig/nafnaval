@@ -1,4 +1,5 @@
 import json
+from urllib.parse import urlparse, parse_qs
 from server.responses import response
 from server.exceptions import NotFound, BadInput, HttpError, MethodNotAllowed
 
@@ -29,6 +30,9 @@ def serve(path, method, body=None):
                 body = json.loads(body)
             except ValueError:
                 raise BadInput('Could not decode body')
-        return getattr(target_handler(), method)(Request(path=rest, body=body))
+        parts = urlparse(rest)
+        return getattr(target_handler(), method)(
+            Request(path=parts.path, query=parse_qs(parts.query), body=body)
+        )
     except HttpError as e:
-        return response(e.error, status_code=e.status_code,)
+        return response(e.data(), status_code=e.status_code,)

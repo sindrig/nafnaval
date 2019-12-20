@@ -242,22 +242,22 @@ resource "aws_dynamodb_table" "names" {
   name = "nafnaval-names"
   billing_mode = "PAY_PER_REQUEST"
   hash_key = "StateId"
-  range_key = "Done"
+  range_key = "Name"
 
   attribute {
     name = "StateId"
     type = "S"
   }
 
-#   attribute {
-#     name = "Name"
-#     type = "S"
-#   }
+   attribute {
+     name = "Name"
+     type = "S"
+   }
 
-  attribute {
-    name = "Done"
-    type = "N"
-  }
+#  attribute {
+#    name = "Done"
+#    type = "N"
+#  }
 
 #  attribute {
 #    name = "Selected"
