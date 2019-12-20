@@ -64,19 +64,5 @@ def test_routes_correctly(get_handler_patch):
 
     assert res == expected
     handler().get.assert_called_once_with(
-        Request(path='rest/of/path', body={'encoded': 'body'}, query={})
-    )
-
-
-@patch('server.router.get_handler')
-def test_gets_query(get_handler_patch):
-    handler = Mock()
-    get_handler_patch.return_value = handler
-
-    serve(path='state/rest?query=1&query=2&other=3', method='get', body=None)
-
-    handler().get.assert_called_once_with(
-        Request(
-            path='rest', body=None, query={'query': ['1', '2'], 'other': ['3']}
-        )
+        Request(path='rest/of/path', body={'encoded': 'body'})
     )

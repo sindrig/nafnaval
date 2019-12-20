@@ -25,16 +25,20 @@ class StateHandler:
 
     def get(self, request):
         state_id = request.path.split('/')[0]
+        if '/' in request.path and request.path.split('/', 1)[-1]:
+            wanted_attributes = request.path.split('/')[1:]
+        else:
+            wanted_attributes = ['remaining']
         attrs = [
             'StateId',
             'Counterpart',
             'Email',
         ]
-        if 'selected' in request.query:
+        if 'selected' in wanted_attributes:
             attrs.append('Selected')
-        elif 'rejected' in request.query:
+        if 'rejected' in wanted_attributes:
             attrs.append('Rejected')
-        else:
+        if 'remaining' in wanted_attributes:
             attrs.append('Remaining')
         state = self.name_table.get_item(
             Key={'StateId': state_id}, ProjectionExpression=','.join(attrs)

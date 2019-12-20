@@ -1,5 +1,5 @@
 import json
-from urllib.parse import urlparse, parse_qs
+from urllib.parse import urlparse
 from server.responses import response
 from server.exceptions import NotFound, BadInput, HttpError, MethodNotAllowed
 
@@ -12,7 +12,6 @@ def get_handler(key):
 
 
 def serve(path, method, body=None):
-    return response(path)
     try:
         try:
             handler_key, rest = path.split('/', 1)
@@ -33,7 +32,7 @@ def serve(path, method, body=None):
                 raise BadInput('Could not decode body')
         parts = urlparse(rest)
         return getattr(target_handler(), method)(
-            Request(path=parts.path, query=parse_qs(parts.query), body=body)
+            Request(path=parts.path, body=body)
         )
     except HttpError as e:
         return response(e.data(), status_code=e.status_code)

@@ -9,7 +9,7 @@ from server.exceptions import BadInput
 
 def test_missing_email1():
     handler = StateHandler()
-    request = Request(path='', body={'email2': 'sindri@irdn.is'}, query={})
+    request = Request(path='', body={'email2': 'sindri@irdn.is'}, )
 
     with pytest.raises(BadInput) as exc:
         handler.put(request)
@@ -19,7 +19,7 @@ def test_missing_email1():
 
 def test_missing_email2():
     handler = StateHandler()
-    request = Request(path='', body={'email1': 'sindri@nafnaval.is'}, query={})
+    request = Request(path='', body={'email1': 'sindri@nafnaval.is'}, )
 
     with pytest.raises(BadInput) as exc:
         handler.put(request)
@@ -30,7 +30,7 @@ def test_missing_email2():
 def test_invalid_emails():
     handler = StateHandler()
     request = Request(
-        path='', body={'email1': 'blah', 'email2': 'blash'}, query={}
+        path='', body={'email1': 'blah', 'email2': 'blash'}
     )
 
     with pytest.raises(BadInput) as exc:
@@ -44,7 +44,6 @@ def test_missing_sex():
     request = Request(
         path='',
         body={'email1': 'sindri@nafnaval.is', 'email2': 'sindri@irdn.is'},
-        query={},
     )
 
     with pytest.raises(BadInput) as exc:
@@ -64,7 +63,6 @@ def test_invalid_sex():
             'email2': 'sindri@irdn.is',
             'sex': 'invalid',
         },
-        query={},
     )
 
     with pytest.raises(BadInput) as exc:
@@ -86,7 +84,6 @@ def test_create_state(uuid_patch, dynamodb):
             'email2': 'sindri@irdn.is',
             'sex': 'male',
         },
-        query={},
     )
 
     state = handler.put(request)

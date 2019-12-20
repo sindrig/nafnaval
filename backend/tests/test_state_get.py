@@ -9,7 +9,7 @@ from server.exceptions import NotFound
 
 def test_get_nonexisting_state(dynamodb):
     guid = str(uuid.uuid4())
-    request = Request(path=f'{guid}/', body=None, query={})
+    request = Request(path=f'{guid}/', body=None)
     handler = StateHandler()
 
     with pytest.raises(NotFound) as exc:
@@ -20,7 +20,7 @@ def test_get_nonexisting_state(dynamodb):
 
 def test_get_state(dynamodb):
     guid = str(uuid.uuid4())
-    request = Request(path=f'{guid}/', body=None, query={})
+    request = Request(path=f'{guid}/', body=None)
     handler = StateHandler()
 
     item = {
@@ -40,7 +40,7 @@ def test_get_state(dynamodb):
 
 def test_get_states_rejected(dynamodb):
     guid = str(uuid.uuid4())
-    request = Request(path=f'{guid}/', body=None, query={'rejected': []})
+    request = Request(path=f'{guid}/rejected', body=None)
     handler = StateHandler()
 
     item = {
