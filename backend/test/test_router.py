@@ -50,7 +50,7 @@ def test_malformed_body(get_handler_patch):
 def test_routes_correctly(get_handler_patch):
     handler = Mock()
     expected = {'expected': 'return_value'}
-    handler.get.return_value = expected
+    handler().get.return_value = expected
     get_handler_patch.return_value = handler
 
     res = serve(
@@ -58,6 +58,6 @@ def test_routes_correctly(get_handler_patch):
     )
 
     assert res == expected
-    handler.get.assert_called_once_with(
+    handler().get.assert_called_once_with(
         Request(path='rest/of/path', body={'encoded': 'body'})
     )

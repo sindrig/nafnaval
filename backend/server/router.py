@@ -35,6 +35,6 @@ def serve(path, method, body=None):
                 body = json.loads(body)
             except ValueError:
                 raise BadInput('Could not decode body')
-        return getattr(target_handler, method)(Request(path=rest, body=body))
+        return getattr(target_handler(), method)(Request(path=rest, body=body))
     except HttpError as e:
         return response(e.error, status_code=e.status_code,)
