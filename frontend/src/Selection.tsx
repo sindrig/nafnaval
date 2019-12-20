@@ -22,7 +22,6 @@ class Selection extends React.Component<SelectionProps> {
 
   private async getNames(e: React.MouseEvent<HTMLAnchorElement>) {
     e.preventDefault();
-
     await this.props.getNames(this.props.match.params.id);
   }
 

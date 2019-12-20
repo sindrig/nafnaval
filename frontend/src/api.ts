@@ -2,7 +2,7 @@ import axios from 'axios';
 import { Name } from './store/names/types';
 
 // TODO: Pull from terraform
-const BASE_URL = 'https://egh9asmxq1.execute-api.us-west-1.amazonaws.com';
+const BASE_URL = 'https://9brd4bxwv9.execute-api.eu-west-1.amazonaws.com/stage/'
 
 const apiClient = axios.create({
   baseURL: BASE_URL,
@@ -16,6 +16,10 @@ interface NamesResponse {
   names: Name[]
 }
 
+interface CreateStateResponse {
+  uuid: string
+}
+
 export const getNameState = async (id: string): Promise<NamesResponse> => {
   try {
     const response = await apiClient.get<NamesResponse>(`/state/${id}`);
@@ -27,3 +31,16 @@ export const getNameState = async (id: string): Promise<NamesResponse> => {
     throw err;
   }
 }
+
+export const createState = async (email1: string, email2: string): Promise<CreateStateResponse> => {
+  try {
+    const response = await apiClient.post<CreateStateResponse>(`/state/`, {email1, email2});
+    return response.data;
+  } catch (err) {
+    if (err && err.response) {
+      return err.response.data;
+    }
+    throw err;
+  }
+}
+

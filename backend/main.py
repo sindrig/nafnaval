@@ -1,7 +1,10 @@
+import json
+
+
 def handler(event, context):
     responseMsg = {
         'statusCode': '200',
-        'body': 'Hello world',
+        'body': json.dumps(event),
         'headers': {
             'Access-Control-Allow-Origin': '*'
         }
