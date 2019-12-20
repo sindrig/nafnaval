@@ -12,7 +12,7 @@ def test_missing_email1():
     request = Request(path='', body={'email2': 'sindri@irdn.is'}, query={})
 
     with pytest.raises(BadInput) as exc:
-        handler.post(request)
+        handler.put(request)
 
     assert exc.value.error == 'Missing email1'
 
@@ -22,7 +22,7 @@ def test_missing_email2():
     request = Request(path='', body={'email1': 'sindri@nafnaval.is'}, query={})
 
     with pytest.raises(BadInput) as exc:
-        handler.post(request)
+        handler.put(request)
 
     assert exc.value.error == 'Missing email2'
 
@@ -34,7 +34,7 @@ def test_invalid_emails():
     )
 
     with pytest.raises(BadInput) as exc:
-        handler.post(request)
+        handler.put(request)
 
     assert exc.value.error == 'Invalid email "blah"'
 
@@ -48,7 +48,7 @@ def test_missing_sex():
     )
 
     with pytest.raises(BadInput) as exc:
-        handler.post(request)
+        handler.put(request)
 
     assert (
         exc.value.error == 'Missing or invalid sex (either "male" or "female")'
@@ -68,7 +68,7 @@ def test_invalid_sex():
     )
 
     with pytest.raises(BadInput) as exc:
-        handler.post(request)
+        handler.put(request)
 
     assert (
         exc.value.error == 'Missing or invalid sex (either "male" or "female")'
@@ -89,7 +89,7 @@ def test_create_state(uuid_patch, dynamodb):
         query={},
     )
 
-    state = handler.post(request)
+    state = handler.put(request)
 
     assert state['statusCode'] == 302
     assert state['headers']['Location'] == f'https://nafnaval.is/some-uuid'

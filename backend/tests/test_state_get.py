@@ -12,11 +12,6 @@ def test_get_nonexisting_state(dynamodb):
     request = Request(path=f'{guid}/', body=None, query={})
     handler = StateHandler()
 
-    # Missing item in config table, we want to raise
-    handler.name_table.put_item(
-        Item={'StateId': guid, 'Done': False, 'Name': 'Sindri'}
-    )
-
     with pytest.raises(NotFound) as exc:
         handler.get(request)
 
@@ -28,18 +23,16 @@ def test_get_state(dynamodb):
     request = Request(path=f'{guid}/', body=None, query={})
     handler = StateHandler()
 
-    config = {'StateId': guid, 'Email': 'ya'}
-    handler.config_table.put_item(Item=config)
-    item = {'StateId': guid, 'Done': False, 'Name': 'Sindri'}
-    handler.name_table.put_item(
-        Item=item
-    )
+    item = {
+        'StateId': guid,
+        'Remaining': ['Sindri'],
+        'Selected': ['Someone'],
+        'Rejected': ['Oged'],
+    }
+    handler.name_table.put_item(Item=item)
 
     response = handler.get(request)
 
     assert response['statusCode'] == 200
     body = json.loads(response['body'])
-    assert body == {
-        'config': config,
-        'names': [item]
-    }
+    assert body == {'StateId': guid, 'Remaining': ['Sindri']}

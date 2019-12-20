@@ -26,7 +26,6 @@ resource "aws_lambda_function" "namelambda" {
   environment {
     variables = {
       NAMES_TABLE = aws_dynamodb_table.names.name
-      CONFIG_TABLE = aws_dynamodb_table.config.name
     }
   }
 
@@ -93,7 +92,7 @@ resource "aws_iam_policy" "lambda_dynamo" {
       "Action": [
         "dynamodb:*"
       ],
-      "Resource": ["${aws_dynamodb_table.names.arn}", "${aws_dynamodb_table.config.arn}"],
+      "Resource": ["${aws_dynamodb_table.names.arn}"],
       "Effect": "Allow"
     }
   ]
@@ -228,24 +227,6 @@ resource "aws_lambda_permission" "apigw" {
    source_arn = "${aws_api_gateway_rest_api.gateway.execution_arn}/*/*/*"
  }
 
-resource "aws_dynamodb_table" "config" {
-  # TODO: Maybe vars?
-  name = "nafnaval-config"
-  billing_mode = "PAY_PER_REQUEST"
-  hash_key = "StateId"
-  # range_key = "Email"
-
-  attribute {
-    name = "StateId"
-    type = "S"
-  }
-
-#  attribute {
-#    name = "Email"
-#    type = "S"
-#  }
-}
-
 resource "aws_dynamodb_table" "names" {
   name = "nafnaval-names"
   billing_mode = "PAY_PER_REQUEST"
@@ -257,20 +238,6 @@ resource "aws_dynamodb_table" "names" {
     type = "S"
   }
 
-   attribute {
-     name = "Name"
-     type = "S"
-   }
-
-#  attribute {
-#    name = "Done"
-#    type = "N"
-#  }
-
-#  attribute {
-#    name = "Selected"
-#    type = "N"
-#  }
 }
 
 output "base_url" {
@@ -279,10 +246,6 @@ output "base_url" {
 
 output "names_table" {
   value = aws_dynamodb_table.names.name
-}
-
-output "config_table" {
-  value = aws_dynamodb_table.config.name
 }
 
 output "codebucket" {

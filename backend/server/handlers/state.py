@@ -22,24 +22,28 @@ class StateHandler:
             'dynamodb', region_name=os.getenv('AWS_REGION')
         )
         self.name_table = dynamodb.Table(os.getenv('NAMES_TABLE'))
-        self.config_table = dynamodb.Table(os.getenv('CONFIG_TABLE'))
 
     def get(self, request):
         state_id = request.path.split('/')[0]
-        config = self.config_table.get_item(Key={'StateId': state_id})
-        if 'Item' not in config:
-            raise NotFound(f'State "{state_id}" not found')
-        kwargs = {'KeyConditionExpression': Key('StateId').eq(state_id)}
-        if 'all' not in request.query:
-            kwargs['FilterExpression'] = Attr('Done').eq(False)
-        return response(
-            {
-                'names': self.name_table.query(**kwargs)['Items'],
-                'config': config['Item'],
-            }
+        attrs = [
+            'StateId',
+            'Counterpart',
+            'Email',
+        ]
+        if 'selected' in request.query:
+            attrs.append('Selected')
+        elif 'rejected' in request.query:
+            attrs.append('Rejected')
+        else:
+            attrs.append('Remaining')
+        state = self.name_table.get_item(
+            Key={'StateId': state_id}, ProjectionExpression=','.join(attrs)
         )
+        if 'Item' not in state:
+            raise NotFound(f'State "{state_id}" not found')
+        return response(state['Item'])
 
-    def post(self, request):
+    def put(self, request):
         email1 = self._get_and_validate_email(request.body, 'email1')
         email2 = self._get_and_validate_email(request.body, 'email2')
         sex = request.body.get('sex')
@@ -51,36 +55,26 @@ class StateHandler:
         state_id = str(uuid.uuid4())
         counterpart = str(uuid.uuid4())
 
-        self.config_table.put_item(
-            Item=self._create_config(state_id, counterpart, email1)
+        self.name_table.put_item(
+            Item=self._create_name_item(state_id, counterpart, email1, names)
         )
-        self.config_table.put_item(
-            Item=self._create_config(counterpart, state_id, email2)
+        self.name_table.put_item(
+            Item=self._create_name_item(counterpart, state_id, email2, names)
         )
-        with self.name_table.batch_writer() as batch:
-            for guid in (state_id, counterpart):
-                for name in names:
-                    batch.put_item(Item=self._create_name(guid, name))
         # TODO: Send emails
         return response(
             headers={'Location': urljoin(FRONTEND_URL, state_id)},
             status_code=302,
         )
 
-    def _create_config(self, state_id, counterpart, email):
+    def _create_name_item(self, state_id, counterpart, email, names):
         return {
             'StateId': state_id,
-            'Email': email,
             'Counterpart': counterpart,
-            'Created': int(time.time()),
-        }
-
-    def _create_name(self, state_id, name):
-        return {
-            'StateId': state_id,
-            'Name': name,
-            'Done': False,
-            'Selected': False,
+            'Email': email,
+            'Remaining': names,
+            'Rejected': [],
+            'Selected': [],
             'Created': int(time.time()),
             'Updated': int(time.time()),
         }
