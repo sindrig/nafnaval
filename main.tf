@@ -231,7 +231,6 @@ resource "aws_dynamodb_table" "names" {
   name = "nafnaval-names"
   billing_mode = "PAY_PER_REQUEST"
   hash_key = "StateId"
-  range_key = "Name"
 
   attribute {
     name = "StateId"

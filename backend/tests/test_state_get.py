@@ -36,3 +36,23 @@ def test_get_state(dynamodb):
     assert response['statusCode'] == 200
     body = json.loads(response['body'])
     assert body == {'StateId': guid, 'Remaining': ['Sindri']}
+
+
+def test_get_states_rejected(dynamodb):
+    guid = str(uuid.uuid4())
+    request = Request(path=f'{guid}/', body=None, query={'rejected': []})
+    handler = StateHandler()
+
+    item = {
+        'StateId': guid,
+        'Remaining': ['Sindri'],
+        'Selected': ['Someone'],
+        'Rejected': ['Oged'],
+    }
+    handler.name_table.put_item(Item=item)
+
+    response = handler.get(request)
+
+    assert response['statusCode'] == 200
+    body = json.loads(response['body'])
+    assert body == {'StateId': guid, 'Rejected': ['Oged']}
