@@ -1,17 +1,16 @@
 #!/usr/bin/env bash
+set -e
 
 (
     rm -rf dist && mkdir -p dist
     cd backend
-    if [ -d "venv" ]; then
-        echo "Have to clean virtual env"
-        rm -rf venv
+    if [ ! -d "dist-venv" ]; then
+        virtualenv dist-venv
     fi
-    virtualenv venv
-    source venv/bin/activate
+    source dist-venv/bin/activate
     pip install -r requirements.txt
     (
-         cd venv/lib/python3.8/site-packages
+         cd dist-venv/lib/python3.8/site-packages
          zip -r9 ${OLDPWD}/code.zip .
     )
     zip -gr code.zip main.py server

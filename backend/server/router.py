@@ -1,19 +1,13 @@
 import json
-from dataclasses import dataclass
 from server.responses import response
 from server.exceptions import NotFound, BadInput, HttpError, MethodNotAllowed
 
 from server.handlers import StateHandler
+from server.request import Request
 
 
 def get_handler(key):
     return {'state': StateHandler}.get(key, None)
-
-
-@dataclass
-class Request:
-    path: str
-    body: dict
 
 
 def serve(path, method, body=None):

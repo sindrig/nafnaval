@@ -12,7 +12,7 @@ resource "aws_s3_bucket" "lambdaholder" {
 resource "aws_lambda_function" "namelambda" {
   function_name = "nafnaval-api-lambda"
   # The bucket name as created earlier with "aws s3api create-bucket"
-  s3_bucket = "${aws_s3_bucket.lambdaholder.id}"
+  s3_bucket = aws_s3_bucket.lambdaholder.id
   s3_key    = "${var.app_version}/code.zip"
   # s3_bucket = "stack-helpers.irdn.is"
   # s3_key = "code.zip"
@@ -22,7 +22,7 @@ resource "aws_lambda_function" "namelambda" {
   handler = "main.handler"
   runtime = "python3.8"
   role = aws_iam_role.lambda_exec.arn
-  depends_on    = ["aws_iam_role_policy_attachment.lambda_logs", "aws_cloudwatch_log_group.example"]
+  depends_on    = [aws_iam_role_policy_attachment.lambda_logs, aws_cloudwatch_log_group.example]
 }
 
 resource "aws_iam_role" "lambda_exec" {
@@ -72,9 +72,35 @@ resource "aws_iam_policy" "lambda_logging" {
 EOF
 }
 
+resource "aws_iam_policy" "lambda_dynamo" {
+  name = "lambda_dynamo"
+  path = "/"
+  description = "IAM policy for dynamodb from a lambda"
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "dynamodb:*"
+      ],
+      "Resource": ["${aws_dynamodb_table.names.arn}", "${aws_dynamodb_table.config.arn}"],
+      "Effect": "Allow"
+    }
+  ]
+}
+EOF
+}
+
 resource "aws_iam_role_policy_attachment" "lambda_logs" {
-  role = "${aws_iam_role.lambda_exec.name}"
-  policy_arn = "${aws_iam_policy.lambda_logging.arn}"
+  role = aws_iam_role.lambda_exec.name
+  policy_arn = aws_iam_policy.lambda_logging.arn
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_dynamo" {
+  role = aws_iam_role.lambda_exec.name
+  policy_arn = aws_iam_policy.lambda_dynamo.arn
 }
 
 resource "aws_api_gateway_rest_api" "gateway" {
@@ -89,16 +115,16 @@ resource "aws_api_gateway_resource" "proxy" {
 }
 
 resource "aws_api_gateway_method" "options_method" {
-    rest_api_id   = "${aws_api_gateway_rest_api.gateway.id}"
-    resource_id   = "${aws_api_gateway_resource.proxy.id}"
+    rest_api_id   = aws_api_gateway_rest_api.gateway.id
+    resource_id   = aws_api_gateway_resource.proxy.id
     http_method   = "OPTIONS"
     authorization = "NONE"
 }
 
 resource "aws_api_gateway_method_response" "options_200" {
-    rest_api_id   = "${aws_api_gateway_rest_api.gateway.id}"
-    resource_id   = "${aws_api_gateway_resource.proxy.id}"
-    http_method   = "${aws_api_gateway_method.options_method.http_method}"
+    rest_api_id   = aws_api_gateway_rest_api.gateway.id
+    resource_id   = aws_api_gateway_resource.proxy.id
+    http_method   = aws_api_gateway_method.options_method.http_method
     status_code   = "200"
     response_models = {
         "application/json" = "Empty"
@@ -108,26 +134,26 @@ resource "aws_api_gateway_method_response" "options_200" {
         "method.response.header.Access-Control-Allow-Methods" = true,
         "method.response.header.Access-Control-Allow-Origin" = true
     }
-    depends_on = ["aws_api_gateway_method.options_method"]
+    depends_on = [aws_api_gateway_method.options_method]
 }
 resource "aws_api_gateway_integration" "options_integration" {
-    rest_api_id   = "${aws_api_gateway_rest_api.gateway.id}"
-    resource_id   = "${aws_api_gateway_resource.proxy.id}"
-    http_method   = "${aws_api_gateway_method.options_method.http_method}"
+    rest_api_id   = aws_api_gateway_rest_api.gateway.id
+    resource_id   = aws_api_gateway_resource.proxy.id
+    http_method   = aws_api_gateway_method.options_method.http_method
     type          = "MOCK"
-    depends_on = ["aws_api_gateway_method.options_method"]
+    depends_on = [aws_api_gateway_method.options_method]
 }
 resource "aws_api_gateway_integration_response" "options_integration_response" {
-    rest_api_id   = "${aws_api_gateway_rest_api.gateway.id}"
-    resource_id   = "${aws_api_gateway_resource.proxy.id}"
-    http_method   = "${aws_api_gateway_method.options_method.http_method}"
-    status_code   = "${aws_api_gateway_method_response.options_200.status_code}"
+    rest_api_id   = aws_api_gateway_rest_api.gateway.id
+    resource_id   = aws_api_gateway_resource.proxy.id
+    http_method   = aws_api_gateway_method.options_method.http_method
+    status_code   = aws_api_gateway_method_response.options_200.status_code
     response_parameters = {
         "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
         "method.response.header.Access-Control-Allow-Methods" = "'GET,OPTIONS,POST,PUT'",
         "method.response.header.Access-Control-Allow-Origin" = "'*'"
     }
-    depends_on = ["aws_api_gateway_method_response.options_200"]
+    depends_on = [aws_api_gateway_method_response.options_200]
 }
 
 resource "aws_api_gateway_method" "proxy" {
@@ -138,14 +164,14 @@ resource "aws_api_gateway_method" "proxy" {
 }
 
 resource "aws_api_gateway_method_response" "cors_method_response_200" {
-    rest_api_id   = "${aws_api_gateway_rest_api.gateway.id}"
-    resource_id   = "${aws_api_gateway_resource.proxy.id}"
-    http_method   = "${aws_api_gateway_method.proxy.http_method}"
+    rest_api_id   = aws_api_gateway_rest_api.gateway.id
+    resource_id   = aws_api_gateway_resource.proxy.id
+    http_method   = aws_api_gateway_method.proxy.http_method
     status_code   = "200"
     response_parameters = {
         "method.response.header.Access-Control-Allow-Origin" = true
     }
-    depends_on = ["aws_api_gateway_method.proxy"]
+    depends_on = [aws_api_gateway_method.proxy]
 }
 
 resource "aws_api_gateway_integration" "lambda" {
@@ -191,17 +217,64 @@ resource "aws_lambda_permission" "apigw" {
    function_name = aws_lambda_function.namelambda.function_name
    principal     = "apigateway.amazonaws.com"
 
-   # The "/*/*" portion grants access from any method on any resource
-   # within the API Gateway REST API.
    source_arn = "${aws_api_gateway_rest_api.gateway.execution_arn}/*/*/*"
  }
+
+resource "aws_dynamodb_table" "config" {
+  # TODO: Maybe vars?
+  name = "nafnaval-config"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key = "StateId"
+  # range_key = "Email"
+
+  attribute {
+    name = "StateId"
+    type = "S"
+  }
+
+#  attribute {
+#    name = "Email"
+#    type = "S"
+#  }
+}
+
+resource "aws_dynamodb_table" "names" {
+  name = "nafnaval-names"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key = "StateId"
+  range_key = "Done"
+
+  attribute {
+    name = "StateId"
+    type = "S"
+  }
+
+#   attribute {
+#     name = "Name"
+#     type = "S"
+#   }
+
+  attribute {
+    name = "Done"
+    type = "N"
+  }
+
+#  attribute {
+#    name = "Selected"
+#    type = "N"
+#  }
+}
 
 output "base_url" {
   value = aws_api_gateway_deployment.deployment.invoke_url
 }
 
-output "sindri" {
-  value = aws_api_gateway_rest_api.gateway.execution_arn
+output "names_table" {
+  value = aws_dynamodb_table.names.name
+}
+
+output "config_table" {
+  value = aws_dynamodb_table.config.name
 }
 
 output "codebucket" {
