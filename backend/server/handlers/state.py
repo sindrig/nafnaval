@@ -65,10 +65,7 @@ class StateHandler:
             Item=self._create_name_item(counterpart, state_id, email2, names)
         )
         # TODO: Send emails
-        return response(
-            headers={'Location': urljoin(FRONTEND_URL, state_id)},
-            status_code=302,
-        )
+        return response({'Location': urljoin(FRONTEND_URL, state_id)},)
 
     def _create_name_item(self, state_id, counterpart, email, names):
         return {
