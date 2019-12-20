@@ -11,7 +11,7 @@ keymap = {
 }
 
 base = os.path.dirname(os.path.abspath(__file__))
-result_folder = os.path.join(base, 'backend', 'names')
+result_folder = os.path.join(base, 'backend', 'server', 'names')
 
 
 def main():
