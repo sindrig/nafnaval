@@ -114,6 +114,27 @@ resource "aws_iam_policy" "lambda_dynamo" {
 EOF
 }
 
+resource "aws_iam_policy" "lambda_ses" {
+  name = "lambda_ses"
+  path = "/"
+  description = "IAM policy for SES from a lambda"
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "ses:SendEmail"
+      ],
+      "Resource": ["*"],
+      "Effect": "Allow"
+    }
+  ]
+}
+EOF
+}
+
 resource "aws_iam_role_policy_attachment" "lambda_logs" {
   role = aws_iam_role.lambda_exec.name
   policy_arn = aws_iam_policy.lambda_logging.arn
@@ -122,6 +143,11 @@ resource "aws_iam_role_policy_attachment" "lambda_logs" {
 resource "aws_iam_role_policy_attachment" "lambda_dynamo" {
   role = aws_iam_role.lambda_exec.name
   policy_arn = aws_iam_policy.lambda_dynamo.arn
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_ses" {
+  role = aws_iam_role.lambda_exec.name
+  policy_arn = aws_iam_policy.lambda_ses.arn
 }
 
 resource "aws_api_gateway_rest_api" "gateway" {

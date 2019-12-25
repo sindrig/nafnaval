@@ -17,7 +17,7 @@ interface NamesResponse {
 }
 
 interface CreateStateResponse {
-  uuid: string
+  Location: string
 }
 
 export const getNameState = async (id: string): Promise<NamesResponse> => {
@@ -32,9 +32,9 @@ export const getNameState = async (id: string): Promise<NamesResponse> => {
   }
 }
 
-export const createState = async (email1: string, email2: string): Promise<CreateStateResponse> => {
+export const createState = async (email1: string, email2: string, sex: string): Promise<CreateStateResponse> => {
   try {
-    const response = await apiClient.post<CreateStateResponse>(`/state/`, {email1, email2});
+    const response = await apiClient.post<CreateStateResponse>(`/state/`, {email1, email2, sex});
     return response.data;
   } catch (err) {
     if (err && err.response) {
