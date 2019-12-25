@@ -5,6 +5,7 @@ import re
 from urllib.parse import urljoin
 
 import boto3
+import botocore
 
 from server.responses import response
 from server.exceptions import NotFound, BadInput
@@ -92,23 +93,29 @@ class StateHandler:
         if rejected:
             adds.append('Rejected :rejected')
         update_expression = (
-            'DELETE Remaining :bodyitems '
-            f'ADD {", ".join(adds)}'
+            'DELETE Remaining :bodyitems ' f'ADD {", ".join(adds)}'
         )
-        result = self.name_table.update_item(
-            Key={'StateId': state_id},
-            UpdateExpression=update_expression,
-            ExpressionAttributeValues={
-                ':bodyitems': selected.union(rejected),
-                ':selected': selected,
-                ':rejected': rejected,
-            },
-            ReturnValues='UPDATED_NEW',
+        try:
+            result = self.name_table.update_item(
+                Key={'StateId': state_id},
+                UpdateExpression=update_expression,
+                ExpressionAttributeValues={
+                    ':bodyitems': selected.union(rejected),
+                    ':selected': selected,
+                    ':rejected': rejected,
+                    ':state_id': state_id,
+                },
+                ReturnValues='UPDATED_NEW',
+                ConditionExpression='StateId = :state_id',
+            )
+        except botocore.exceptions.ClientError as e:
+            code = e.response['Error']['Code']
+            if code != 'ConditionalCheckFailedException':
+                raise
+            raise NotFound(f'State "{state_id}" not found')
+        return response(
+            {k: list(v - _blank_set) for k, v in result['Attributes'].items()}
         )
-        return response({
-            k: list(v - _blank_set)
-            for k, v in result['Attributes'].items()
-        })
 
     def _create_name_item(self, state_id, counterpart, email, names):
         return {

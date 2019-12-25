@@ -1,7 +1,22 @@
 import json
+
+import pytest
+
 from server.handlers import StateHandler
 from server.request import Request
 from server import names
+from server.exceptions import NotFound
+
+
+def test_post_nonexist_state(dynamodb):
+    handler = StateHandler()
+    state_id = 'test'
+    request = Request(
+        path=f'{state_id}/', body={'Select': ['Arnar'], 'Reject': ['Bjarni']},
+    )
+
+    with pytest.raises(NotFound):
+        handler.post(request)
 
 
 def test_select_names(dynamodb):
