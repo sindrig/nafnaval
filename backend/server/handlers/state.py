@@ -46,12 +46,12 @@ class StateHandler:
             attrs.append('Rejected')
         if 'remaining' in wanted_attributes:
             attrs.append('Remaining')
-        state = self.name_table.get_item(
+        result = self.name_table.get_item(
             Key={'StateId': state_id}, ProjectionExpression=','.join(attrs)
         )
-        if 'Item' not in state:
+        if 'Item' not in result:
             raise NotFound(f'State "{state_id}" not found')
-        return response(state['Item'])
+        return response(self._serializable(result['Item']))
 
     def put(self, request):
         email1 = self._get_and_validate_email(request.body, 'email1')
@@ -113,9 +113,7 @@ class StateHandler:
             if code != 'ConditionalCheckFailedException':
                 raise
             raise NotFound(f'State "{state_id}" not found')
-        return response(
-            {k: list(v - _blank_set) for k, v in result['Attributes'].items()}
-        )
+        return response(self._serializable(result['Attributes']))
 
     def _create_name_item(self, state_id, counterpart, email, names):
         return {
@@ -155,3 +153,9 @@ class StateHandler:
             },
         )
         print(f'Sent email with message id {response["MessageId"]}')
+
+    def _serializable(self, item):
+        return {
+            k: list(v - _blank_set) if isinstance(v, set) else v
+            for k, v in item.items()
+        }

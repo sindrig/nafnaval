@@ -25,9 +25,9 @@ def test_get_state(dynamodb):
 
     item = {
         'StateId': guid,
-        'Remaining': ['Sindri'],
-        'Selected': ['Someone'],
-        'Rejected': ['Oged'],
+        'Remaining': {'Sindri'},
+        'Selected': {'Someone'},
+        'Rejected': {'Oged'},
     }
     handler.name_table.put_item(Item=item)
 
@@ -45,9 +45,9 @@ def test_get_states_rejected(dynamodb):
 
     item = {
         'StateId': guid,
-        'Remaining': ['Sindri'],
-        'Selected': ['Someone'],
-        'Rejected': ['Oged'],
+        'Remaining': {'Sindri'},
+        'Selected': {'Someone'},
+        'Rejected': {'Oged'},
     }
     handler.name_table.put_item(Item=item)
 
