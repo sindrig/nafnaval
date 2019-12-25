@@ -447,3 +447,7 @@ output "codebucket" {
 output "frontendbucket" {
   value = aws_s3_bucket.www.bucket
 }
+
+output "cloudfront" {
+  value = aws_cloudfront_distribution.www_distribution.id
+}

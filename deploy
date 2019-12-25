@@ -14,3 +14,4 @@ terraform apply -var="app_version=$CODE_VERSION" -auto-approve
 FRONTEND_BUCKET=`terraform output frontendbucket`
 
 aws s3 sync frontend/build s3://$FRONTEND_BUCKET
+aws cloudfront create-invalidation --distribution-id `terraform output cloudfront` --paths "/index.html"
