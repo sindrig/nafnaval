@@ -1,7 +1,7 @@
 import pytest
 import os
 import boto3
-from moto import mock_dynamodb2
+from moto import mock_dynamodb2, mock_ses
 
 
 # @pytest.fixture(scope='function')
@@ -26,9 +26,7 @@ def dynamodb():
         )
         table = dynamo.create_table(
             TableName=names_table,
-            KeySchema=[
-                {'AttributeName': 'StateId', 'KeyType': 'HASH'},
-            ],
+            KeySchema=[{'AttributeName': 'StateId', 'KeyType': 'HASH'}],
             AttributeDefinitions=[
                 {'AttributeName': 'StateId', 'AttributeType': 'S'},
             ],
@@ -37,3 +35,11 @@ def dynamodb():
             TableName=names_table
         )
         yield dynamo
+
+
+@pytest.fixture(scope='function')
+def ses():
+    with mock_ses():
+        ses = boto3.client('ses', region_name=os.environ['AWS_REGION'])
+        ses.verify_domain_identity(Domain='nafnaval.is')
+        yield ses
