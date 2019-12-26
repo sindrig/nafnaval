@@ -151,56 +151,14 @@ resource "aws_iam_role_policy_attachment" "lambda_ses" {
 }
 
 resource "aws_api_gateway_rest_api" "gateway" {
-  name        = "ServerlessExample"
-  description = "Terraform Serverless Application Example"
+  name        = "NafnavalGateway"
+  description = "Terraform Gateway to Nafnaval lambda"
 }
 
 resource "aws_api_gateway_resource" "proxy" {
    rest_api_id = aws_api_gateway_rest_api.gateway.id
    parent_id   = aws_api_gateway_rest_api.gateway.root_resource_id
    path_part   = "{proxy+}"
-}
-
-resource "aws_api_gateway_method" "options_method" {
-    rest_api_id   = aws_api_gateway_rest_api.gateway.id
-    resource_id   = aws_api_gateway_resource.proxy.id
-    http_method   = "OPTIONS"
-    authorization = "NONE"
-}
-
-resource "aws_api_gateway_method_response" "options_200" {
-    rest_api_id   = aws_api_gateway_rest_api.gateway.id
-    resource_id   = aws_api_gateway_resource.proxy.id
-    http_method   = aws_api_gateway_method.options_method.http_method
-    status_code   = "200"
-    response_models = {
-        "application/json" = "Empty"
-    }
-    response_parameters = {
-        "method.response.header.Access-Control-Allow-Headers" = true,
-        "method.response.header.Access-Control-Allow-Methods" = true,
-        "method.response.header.Access-Control-Allow-Origin" = true
-    }
-    depends_on = [aws_api_gateway_method.options_method]
-}
-resource "aws_api_gateway_integration" "options_integration" {
-    rest_api_id   = aws_api_gateway_rest_api.gateway.id
-    resource_id   = aws_api_gateway_resource.proxy.id
-    http_method   = aws_api_gateway_method.options_method.http_method
-    type          = "MOCK"
-    depends_on = [aws_api_gateway_method.options_method]
-}
-resource "aws_api_gateway_integration_response" "options_integration_response" {
-    rest_api_id   = aws_api_gateway_rest_api.gateway.id
-    resource_id   = aws_api_gateway_resource.proxy.id
-    http_method   = aws_api_gateway_method.options_method.http_method
-    status_code   = aws_api_gateway_method_response.options_200.status_code
-    response_parameters = {
-        "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
-        "method.response.header.Access-Control-Allow-Methods" = "'GET,OPTIONS,POST,PUT'",
-        "method.response.header.Access-Control-Allow-Origin" = "'*'"
-    }
-    depends_on = [aws_api_gateway_method_response.options_200]
 }
 
 resource "aws_api_gateway_method" "proxy" {
@@ -214,9 +172,18 @@ resource "aws_api_gateway_method_response" "cors_method_response_200" {
     rest_api_id   = aws_api_gateway_rest_api.gateway.id
     resource_id   = aws_api_gateway_resource.proxy.id
     http_method   = aws_api_gateway_method.proxy.http_method
-    status_code   = "200"
+    status_code   = 200
+    #response_parameters = {
+        #"method.response.header.Access-Control-Allow-Origin" = true
+    #}
+    response_models = {
+      "application/json" = "Empty"
+    }
+
     response_parameters = {
-        "method.response.header.Access-Control-Allow-Origin" = true
+      "method.response.header.Access-Control-Allow-Headers" = true
+      "method.response.header.Access-Control-Allow-Methods" = true
+      "method.response.header.Access-Control-Allow-Origin" = true
     }
     depends_on = [aws_api_gateway_method.proxy]
 }
@@ -238,7 +205,7 @@ resource "aws_api_gateway_method" "proxy_root" {
    authorization = "NONE"
  }
 
- resource "aws_api_gateway_integration" "lambda_root" {
+resource "aws_api_gateway_integration" "lambda_root" {
    rest_api_id = aws_api_gateway_rest_api.gateway.id
    resource_id = aws_api_gateway_method.proxy_root.resource_id
    http_method = aws_api_gateway_method.proxy_root.http_method
@@ -248,7 +215,7 @@ resource "aws_api_gateway_method" "proxy_root" {
    uri                     = aws_lambda_function.namelambda.invoke_arn
  }
 
- resource "aws_api_gateway_deployment" "deployment" {
+resource "aws_api_gateway_deployment" "deployment" {
    depends_on = [
      aws_api_gateway_integration.lambda,
      aws_api_gateway_integration.lambda_root,
@@ -257,6 +224,16 @@ resource "aws_api_gateway_method" "proxy_root" {
    rest_api_id = aws_api_gateway_rest_api.gateway.id
    stage_name  = "stage"
  }
+
+module "gateway_cors" {
+  source  = "bridgecrewio/apigateway-cors/aws"
+  version = "1.1.0"
+
+  api = aws_api_gateway_rest_api.gateway.id
+  resources = [aws_api_gateway_resource.proxy.id]
+
+  methods = ["GET", "POST", "PUT"]
+}
 
 resource "aws_lambda_permission" "apigw" {
    statement_id  = "AllowAPIGatewayInvoke"

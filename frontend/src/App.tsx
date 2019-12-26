@@ -4,33 +4,56 @@ import {
   Switch,
   Route,
 } from 'react-router-dom';
+import { connect, ConnectedProps } from 'react-redux';
 import { useTranslation } from 'react-i18next';
+// @ts-ignore
+import LoadingOverlay from 'react-loading-overlay';
+import { IStoreState } from './store/reducer';
 import Selection from './Selection';
 import Signup from './Signup';
 import './App.css';
 
-const App: React.FC = () => {
-  const { i18n } = useTranslation();
+function mapStateToProps(state: IStoreState) {
+// function mapStateToProps({ names: { initializing } }: IStoreState) {
+  return { initializing: state.names.initializing };
+}
+
+const connector = connect(mapStateToProps);
+
+type PropsFromRedux = ConnectedProps<typeof connector>
+type Props = PropsFromRedux & {
+  initializing: boolean
+}
+
+
+const App: React.FC<Props> = (props: Props) => {
+  const { i18n, t } = useTranslation();
   return (
       <Router>
         <div>
-          <div className="language-selector">
-            <button onClick={() => i18n.changeLanguage('is')}>is</button>
-            <button onClick={() => i18n.changeLanguage('en')}>en</button>
-          </div>
-          {/* A <Switch> looks through its children <Route>s and
-              renders the first one that matches the current URL. */}
-          <Switch>
-            <Route path="/:id([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})">
-              <Selection />
-            </Route>
-            <Route path="/">
-              <Signup />
-            </Route>
-          </Switch>
+          <LoadingOverlay
+            active={props.initializing}
+            spinner
+            text={t('Loading...')}
+          >
+            <div className="language-selector">
+              <button onClick={() => i18n.changeLanguage('is')}>is</button>
+              <button onClick={() => i18n.changeLanguage('en')}>en</button>
+            </div>
+            {/* A <Switch> looks through its children <Route>s and
+                renders the first one that matches the current URL. */}
+            <Switch>
+              <Route path="/:id([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})">
+                <Selection />
+              </Route>
+              <Route path="/">
+                <Signup />
+              </Route>
+            </Switch>
+          </LoadingOverlay>
         </div>
       </Router>
     );
 }
 
-export default App;
+export default connector(App);

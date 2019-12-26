@@ -21,6 +21,7 @@ const resources = {
       'Submit': 'Byrja!',
       'Male': 'Drengur',
       'Female': 'Stúlka',
+      'Loading...': 'Hleð...',
     },
   },
 };

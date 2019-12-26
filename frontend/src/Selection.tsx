@@ -20,6 +20,10 @@ class Selection extends React.Component<SelectionProps> {
     this.getNames = this.getNames.bind(this);
   }
 
+  componentDidMount() {
+    this.props.getNames(this.props.match.params.id);
+  }
+
   private async getNames(e: React.MouseEvent<HTMLButtonElement>) {
     e.preventDefault();
     await this.props.getNames(this.props.match.params.id);

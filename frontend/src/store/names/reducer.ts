@@ -1,6 +1,6 @@
 import {
     NameState,
-    GET_NAMES,
+    GET_NAMES_STARTED,
     GET_NAMES_DONE,
     NameActionTypes,
 } from './types';
@@ -17,7 +17,7 @@ export default function nameReducer(
   action: NameActionTypes
 ): NameState {
   switch (action.type) {
-    case GET_NAMES:
+    case GET_NAMES_STARTED:
         return {
             ...state,
             initializing: true,

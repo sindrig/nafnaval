@@ -6,6 +6,9 @@ export interface Name {
 
 export interface NameState {
     names: Name[],
+    remaining: string,
+    selected: string,
+    rejected: string,
     initializing: boolean,
     error: boolean,
 }
