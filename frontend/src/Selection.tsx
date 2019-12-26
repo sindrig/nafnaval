@@ -4,40 +4,37 @@ import { RouteComponentProps, withRouter } from "react-router-dom";
 import { Dispatch, Action, bindActionCreators } from 'redux';
 import { IStoreState } from './store/reducer';
 import { getNames as getNamesAction } from './store/names/actions';
-import { Name } from './store/names/types';
 
 
 interface SelectionProps extends RouteComponentProps<any> {
-  readonly names: Name[]
-  readonly error: boolean
-  readonly initializing: boolean
+  readonly remaining: string[]
   getNames: (id: string) => (dispatch: Dispatch<Action>) => Promise<void>
 }
 
 class Selection extends React.Component<SelectionProps> {
   constructor(props: SelectionProps) {
     super(props);
-    this.getNames = this.getNames.bind(this);
   }
 
   componentDidMount() {
-    this.props.getNames(this.props.match.params.id);
-  }
-
-  private async getNames(e: React.MouseEvent<HTMLButtonElement>) {
-    e.preventDefault();
-    await this.props.getNames(this.props.match.params.id);
+    const { getNames, match: { params }} = this.props;
+    getNames(params.id);
   }
 
   render() {
+    const { remaining } = this.props;
+    if ( remaining.length === 0 ) {
+      return <div>All done... TODO</div>
+    }
+    const name = remaining[Math.floor(Math.random() * remaining.length)];
     return (
-      <button onClick={this.getNames}>Get names</button>
+      <div>{name}</div>
     )
   }
 }
 
-function mapStateToProps(state: IStoreState) {
-  return state.names;
+function mapStateToProps({ names: { remaining }}: IStoreState) {
+  return { remaining };
 }
 
 function mapDispatchToProps(dispatch: Dispatch<Action>) {

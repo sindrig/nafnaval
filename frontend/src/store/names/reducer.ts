@@ -7,7 +7,9 @@ import {
 
 
 const initialState: NameState = {
-  names: [],
+  remaining: [],
+  selected: [],
+  rejected: [],
   initializing: true,
   error: false,
 }
@@ -26,7 +28,7 @@ export default function nameReducer(
         return {
             initializing: false,
             error: false,
-            names: action.payload,
+            ...action.payload
         }
     default:
       return state

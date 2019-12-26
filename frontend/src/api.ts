@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { Name } from './store/names/types';
 
 // TODO: Pull from terraform
 const BASE_URL = process.env.REACT_APP_BASE_API_URL;
@@ -13,7 +12,6 @@ const apiClient = axios.create({
 });
 
 interface NamesResponse {
-  // names: Name[]
   Remaining: string[]
   Selected?: string[]
   Rejected?: string[]

@@ -9,7 +9,14 @@ export function getNames(id: string): (dispatch: Dispatch<NameActionTypes>) => P
 
         try {
             const payload = await getNameState(id);
-            dispatch({type: GET_NAMES_DONE, payload: payload.names})
+            dispatch({
+                type: GET_NAMES_DONE,
+                payload: {
+                    remaining: payload.Remaining,
+                    rejected: payload.Rejected || [],
+                    selected: payload.Selected || []
+               }
+            });
         } catch (e) {
             console.error(e);
         }
