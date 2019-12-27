@@ -1,6 +1,8 @@
 import axios from 'axios';
+// TODO there has got to be a better way
+import store from './store';
 
-// TODO: Pull from terraform
+// TODO: Pull from terraform on build time
 const BASE_URL = process.env.REACT_APP_BASE_API_URL;
 
 const apiClient = axios.create({
@@ -15,9 +17,9 @@ interface NamesResponse {
   Remaining: string[]
   Selected?: string[]
   Rejected?: string[]
-  StateId: string
-  Counterpart: string
-  Email: string
+  StateId?: string
+  Counterpart?: string
+  Email?: string
 }
 
 interface CreateStateResponse {
@@ -42,6 +44,16 @@ export const getNameState = async (id: string): Promise<NamesResponse> => {
 }
 
 export const selectNames = async (id: string, select: Array<string>, reject: Array<string>): Promise<NamesResponse> => {
+  if(process.env.NODE_ENV === "development") {
+    const state = store.getState().names;
+    return new Promise((resolve) => {
+      resolve({
+        Remaining: state.remaining.filter(name => select.indexOf(name) < 0 && reject.indexOf(name) < 0).toJS(),
+        Selected: state.selected.concat(select).toJS(),
+        Rejected: state.rejected.concat(reject).toJS(),
+      })
+    });
+  }
   try {
     const response = await apiClient.post<NamesResponse>(`/state/${id}`, {select, reject});
     return response.data;
@@ -54,6 +66,9 @@ export const selectNames = async (id: string, select: Array<string>, reject: Arr
 }
 
 export const createState = async (email1: string, email2: string, sex: string): Promise<CreateStateResponse> => {
+  if (process.env.NODE_ENV === "development") {
+    return new Promise(resolve => resolve({stateId: 'd0391b6c-a5df-4597-993c-1dac2dca8bc4'}));
+  }
   try {
     const response = await apiClient.put<CreateStateResponse>(`/state/`, {email1, email2, sex});
     return response.data;
