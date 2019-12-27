@@ -1,37 +1,34 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
 import { RouteComponentProps, withRouter } from "react-router-dom";
 import { Dispatch, Action, bindActionCreators } from 'redux';
+import { List } from 'immutable';
 import { IStoreState } from './store/reducer';
 import { getNames as getNamesAction } from './store/names/actions';
+import Name from './SelectionName';
+import SelectionSave from './SelectionSave';
+import './Selection.css'
 
 
 interface SelectionProps extends RouteComponentProps<any> {
-  readonly remaining: string[]
+  remaining: List<string>
   getNames: (id: string) => (dispatch: Dispatch<Action>) => Promise<void>
 }
 
-class Selection extends React.Component<SelectionProps> {
-  constructor(props: SelectionProps) {
-    super(props);
-  }
 
-  componentDidMount() {
-    const { getNames, match: { params }} = this.props;
-    getNames(params.id);
+const Selection: React.FC<SelectionProps> = ({getNames, remaining, match: { params }}: SelectionProps) => {
+  useEffect(() => {getNames(params.id)}, []);
+  if ( remaining.size === 0 ) {
+    return <div>All done... TODO</div>
   }
-
-  render() {
-    const { remaining } = this.props;
-    if ( remaining.length === 0 ) {
-      return <div>All done... TODO</div>
-    }
-    const name = remaining[Math.floor(Math.random() * remaining.length)];
-    return (
-      <div>{name}</div>
-    )
-  }
+  return (
+    <div className="selection">
+      <SelectionSave />
+      <Name name={remaining.get(0) || ''} />
+    </div>
+  )
 }
+
 
 function mapStateToProps({ names: { remaining }}: IStoreState) {
   return { remaining };

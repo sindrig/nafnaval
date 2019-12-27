@@ -22,6 +22,8 @@ const resources = {
       'Male': 'Drengur',
       'Female': 'Stúlka',
       'Loading...': 'Hleð...',
+      'Select': 'Velja',
+      'Reject': 'Hafna',
     },
   },
 };
