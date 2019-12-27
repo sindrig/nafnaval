@@ -1,7 +1,9 @@
 import React from 'react';
 import { connect, ConnectedProps } from 'react-redux';
+import { Redirect } from 'react-router';
 import { Dispatch, Action, bindActionCreators } from 'redux';
 import { signUp as signUpAction } from './store/names/actions';
+import { IStoreState } from './store/reducer';
 import useForm from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import './App.css';
@@ -12,11 +14,16 @@ function mapDispatchToProps(dispatch: Dispatch<Action>) {
   };
 }
 
-const connector = connect(null, mapDispatchToProps);
+function mapStateToProps({ names: { stateId }}: IStoreState) {
+  return { stateId };
+}
+
+const connector = connect(mapStateToProps, mapDispatchToProps);
 
 type PropsFromRedux = ConnectedProps<typeof connector>
 type Props = PropsFromRedux & {
   signUp: Function
+  stateId?: string
 }
 
 interface SignupForm {
@@ -25,11 +32,14 @@ interface SignupForm {
     sex: string
 }
 
-const Signup: React.FC<Props> = (props: Props) => {
+const Signup: React.FC<Props> = ({ signUp, stateId }: Props) => {
     const { register, handleSubmit } = useForm<SignupForm>();
     const { t } = useTranslation();
     const onSubmit = ({email1, email2, sex}: SignupForm) => {
-        props.signUp(email1, email2, sex);
+        signUp(email1, email2, sex);
+    }
+    if (stateId) {
+        return <Redirect to={`/${stateId}`} />
     }
     return (
         <div>

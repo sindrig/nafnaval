@@ -1,12 +1,12 @@
 import { Dispatch } from 'redux';
-import { GET_NAMES_STARTED, GET_NAMES_DONE, NAME_SELECTED, NameActionTypes, Selection, NameSelection } from './types';
+import { LOADING, GET_NAMES_DONE, NAME_SELECTED, SIGNUP_DONE, NameActionTypes, Selection, NameSelection } from './types';
 import { getNameState, createState, selectNames } from '../../api';
 import { fromJS, List } from 'immutable';
 
 
 export function getNames(id: string): (dispatch: Dispatch<NameActionTypes>) => Promise<void> {
     return async (dispatch: Dispatch<NameActionTypes>) => {
-        dispatch({type: GET_NAMES_STARTED});
+        dispatch({type: LOADING});
 
         const payload = await getNameState(id);
         dispatch({
@@ -23,11 +23,13 @@ export function getNames(id: string): (dispatch: Dispatch<NameActionTypes>) => P
 
 export function signUp(email1: string, email2: string, sex: string): (dispatch: Dispatch<NameActionTypes>) => Promise<void> {
     return async (dispatch: Dispatch<NameActionTypes>) => {
-        dispatch({type: GET_NAMES_STARTED});
+        dispatch({type: LOADING});
 
-        const payload = await createState(email1, email2, sex);
-        // TODO: Use react router?
-        window.location.href = payload.Location;
+        const { stateId } = await createState(email1, email2, sex);
+        dispatch({
+            type: SIGNUP_DONE,
+            payload: {stateId},
+        })
     }
 }
 
@@ -53,7 +55,7 @@ export function selectName(name: string): (dispatch: Dispatch<NameActionTypes>) 
 
 export function saveSelections(id: string, selections: List<NameSelection>): (dispatch: Dispatch<NameActionTypes>) => Promise<void> {
     return async(dispatch: Dispatch<NameActionTypes>) => {
-        dispatch({type: GET_NAMES_STARTED});
+        dispatch({type: LOADING});
         const select = selections
             .filter(({ selection }) => selection === Selection.select)
             .map(({ name }) => name)

@@ -21,7 +21,7 @@ interface NamesResponse {
 }
 
 interface CreateStateResponse {
-  Location: string
+  stateId: string
 }
 
 export const getNameState = async (id: string): Promise<NamesResponse> => {
