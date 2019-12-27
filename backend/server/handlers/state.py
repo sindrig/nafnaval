@@ -85,13 +85,21 @@ class StateHandler:
 
     def post(self, request):
         state_id = self._get_state_id(request)
-        selected = set(request.body.get('Select', []))
-        rejected = set(request.body.get('Reject', []))
+        selected = set(request.body.get('select', []))
+        rejected = set(request.body.get('reject', []))
+        if not selected and not rejected:
+            raise BadInput('Nothing to select or reject')
         adds = []
+        attribute_values = {
+            ':bodyitems': selected.union(rejected),
+            ':state_id': state_id,
+        }
         if selected:
             adds.append('Selected :selected')
+            attribute_values[':selected'] = selected
         if rejected:
             adds.append('Rejected :rejected')
+            attribute_values[':rejected'] = rejected
         update_expression = (
             'DELETE Remaining :bodyitems ' f'ADD {", ".join(adds)}'
         )
@@ -99,12 +107,7 @@ class StateHandler:
             result = self.name_table.update_item(
                 Key={'StateId': state_id},
                 UpdateExpression=update_expression,
-                ExpressionAttributeValues={
-                    ':bodyitems': selected.union(rejected),
-                    ':selected': selected,
-                    ':rejected': rejected,
-                    ':state_id': state_id,
-                },
+                ExpressionAttributeValues=attribute_values,
                 ReturnValues='UPDATED_NEW',
                 ConditionExpression='StateId = :state_id',
             )

@@ -5,17 +5,28 @@ import pytest
 from server.handlers import StateHandler
 from server.request import Request
 from server import names
-from server.exceptions import NotFound
+from server.exceptions import NotFound, BadInput
 
 
 def test_post_nonexist_state(dynamodb):
     handler = StateHandler()
     state_id = 'test'
     request = Request(
-        path=f'{state_id}/', body={'Select': ['Arnar'], 'Reject': ['Bjarni']},
+        path=f'{state_id}/', body={'select': ['Arnar'], 'reject': ['Bjarni']},
     )
 
     with pytest.raises(NotFound):
+        handler.post(request)
+
+
+def test_post_empty_select_reject(dynamodb):
+    handler = StateHandler()
+    state_id = 'test'
+    request = Request(
+        path=f'{state_id}/', body={'select': [], 'reject': []},
+    )
+
+    with pytest.raises(BadInput):
         handler.post(request)
 
 
@@ -29,7 +40,7 @@ def test_select_names(dynamodb):
     )
     request = Request(
         path=f'{state_id}/',
-        body={'Select': ['Sindri', 'Óttar'], 'Reject': ['Aðalráður']},
+        body={'select': ['Sindri', 'Óttar'], 'reject': ['Aðalráður']},
     )
 
     response = handler.post(request)
@@ -43,7 +54,7 @@ def test_select_names(dynamodb):
     assert sorted(body['Selected']) == sorted(['Sindri', 'Óttar'])
     assert body['Rejected'] == ['Aðalráður']
 
-    request = Request(path=f'{state_id}/', body={'Select': ['Guðmundur']})
+    request = Request(path=f'{state_id}/', body={'select': ['Guðmundur']})
 
     response = handler.post(request)
 
