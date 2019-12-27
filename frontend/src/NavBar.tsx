@@ -8,6 +8,8 @@ import AppBar from 'material-ui/AppBar';
 import FontIcon from 'material-ui/FontIcon';
 import Drawer from 'material-ui/Drawer';
 import MenuItem from 'material-ui/MenuItem';
+import IconButton from "@material-ui/core/IconButton";
+import MoreVertIcon from "@material-ui/icons/MoreVert";
 import './NavBar.css'
 
 
@@ -17,17 +19,61 @@ function mapStateToProps({ names: { stateId }}: IStoreState) {
 
 const connector = connect(mapStateToProps);
 
-interface Props extends RouteComponentProps<any> {
+interface Props {
   stateId?: string
+  open: boolean
+  closeMenu: () => void
 }
 
 
-const NavBar: React.FC<Props> = ({match: { params }, stateId}: Props) => {
+const LeftDrawer: React.FC<Props> = ({ stateId, closeMenu, open }: Props) => {
   const { t } = useTranslation();
-  const [open, setOpen] = useState(false);
-  if ( !stateId ) {
-    return null;
+  const links = [];
+  if (stateId) {
+    links.push(
+      <Link to={`/${stateId}`}>
+        <MenuItem onClick={closeMenu}>
+          {t('Select')}
+        </MenuItem>
+      </Link>
+     )
+    links.push(
+      <Link to={`/${stateId}/selected`}>
+        <MenuItem onClick={closeMenu}>
+          {t('View selected')}
+        </MenuItem>
+      </Link>
+     )
+    links.push(
+      <Link to={`/${stateId}/rejected`}>
+        <MenuItem onClick={closeMenu}>
+          {t('View rejected')}
+        </MenuItem>
+      </Link>
+     )
   }
+  links.push(
+    <Link to={`/about`}>
+      <MenuItem onClick={closeMenu}>
+        {t('About')}
+      </MenuItem>
+    </Link>
+  );
+  return (
+      <Drawer
+        open={open}
+        docked={false}
+        width={200}
+        onRequestChange={closeMenu}
+      >
+        {links}
+
+      </Drawer>
+   )
+}
+
+const NavBar: React.FC<RouteComponentProps<any>> = ({match: { params }}: RouteComponentProps) => {
+  const [open, setOpen] = useState(false);
   const openMenu = () => setOpen(true);
   const closeMenu = () => setOpen(false);
   return (
@@ -36,29 +82,14 @@ const NavBar: React.FC<Props> = ({match: { params }, stateId}: Props) => {
         title="Nafnaval.is"
         onTitleClick={(openMenu)}
         iconElementLeft={<FontIcon onClick={(openMenu)} className="material-icons">menu</FontIcon>}
-      />
-      <Drawer
-        open={open}
-        docked={false}
-        width={200}
-        onRequestChange={(open) => setOpen(open)}
       >
-        <Link to={`/${stateId}`}>
-          <MenuItem onClick={closeMenu}>
-            {t('Select')}
-          </MenuItem>
-        </Link>
-        <Link to={`/${stateId}/selected`}>
-          <MenuItem onClick={closeMenu}>
-            {t('View selected')}
-          </MenuItem>
-        </Link>
-        <Link to={`/${stateId}/rejected`}>
-          <MenuItem onClick={closeMenu}>
-            {t('View rejected')}
-          </MenuItem>
-        </Link>
-      </Drawer>
+        <LeftDrawer open={open} closeMenu={closeMenu} />
+        <span className="navigation-toolbar">
+          <IconButton color="inherit" aria-label="More Options">
+            <MoreVertIcon />
+          </IconButton>
+        </span>
+      </AppBar>
     </div>
   )
 }
