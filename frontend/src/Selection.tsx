@@ -17,7 +17,7 @@ interface SelectionProps extends RouteComponentProps<any> {
 
 
 const Selection: React.FC<SelectionProps> = ({getNames, remaining, match: { params }}: SelectionProps) => {
-  useEffect(() => {getNames(params.id)}, [getNames, params]);
+  useEffect(() => {getNames(params.id)}, [getNames, params.id]);
   if ( remaining.size === 0 ) {
     return <div>All done... TODO</div>
   }
