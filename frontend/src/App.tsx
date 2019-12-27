@@ -11,6 +11,7 @@ import LoadingOverlay from 'react-loading-overlay';
 import { IStoreState } from './store/reducer';
 import Selection from './Selection';
 import Signup from './Signup';
+import NavBar from './NavBar';
 import './App.css';
 
 function mapStateToProps(state: IStoreState) {
@@ -36,6 +37,7 @@ const App: React.FC<Props> = (props: Props) => {
             spinner
             text={t('Loading...')}
           >
+            <NavBar />
             <div className="language-selector">
               <button onClick={() => i18n.changeLanguage('is')}>is</button>
               <button onClick={() => i18n.changeLanguage('en')}>en</button>

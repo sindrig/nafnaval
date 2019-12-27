@@ -4,6 +4,7 @@ import { Provider } from 'react-redux';
 import store from './store';
 import './index.css';
 import App from './App';
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import * as serviceWorker from './serviceWorker';
 
 import './i18n';
@@ -13,9 +14,11 @@ if (!process.env.REACT_APP_BASE_API_URL) {
 }
 
 ReactDOM.render(
-    <Provider store={store}>
-        <App />
-    </Provider>,
+    <MuiThemeProvider>
+        <Provider store={store}>
+            <App />
+        </Provider>
+    </MuiThemeProvider>,
     document.getElementById('root'),
 );
 

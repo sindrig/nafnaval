@@ -33,7 +33,7 @@ i18n
   .init({
     resources,
     fallbackLng: 'is',
-
+    lng: 'is',
     keySeparator: false,
 
     interpolation: {

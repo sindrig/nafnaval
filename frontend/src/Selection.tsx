@@ -7,7 +7,6 @@ import { IStoreState } from './store/reducer';
 import { getNames as getNamesAction } from './store/names/actions';
 import Name from './SelectionName';
 import SelectionSave from './SelectionSave';
-import NavBar from './NavBar';
 import './Selection.css'
 
 
@@ -24,7 +23,6 @@ const Selection: React.FC<SelectionProps> = ({getNames, remaining, match: { para
   }
   return (
     <div className="selection">
-      <NavBar />
       <SelectionSave />
       <Name name={remaining.get(0) || ''} />
     </div>

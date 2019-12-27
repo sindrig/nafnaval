@@ -10,4 +10,5 @@ div.navigation-bar {
 
 div.navigation-bar a {
   text-decoration: none;
+  display: block;
 }
