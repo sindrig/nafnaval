@@ -1,10 +1,8 @@
 import React from 'react';
 import { connect, ConnectedProps } from 'react-redux';
 import { Dispatch, Action, bindActionCreators } from 'redux';
-import { IStoreState } from './store/reducer';
 import { rejectName, selectName } from './store/names/actions';
 import { useTranslation } from 'react-i18next';
-import { List } from 'immutable';
 import './SelectionName.css'
 
 function mapDispatchToProps(dispatch: Dispatch<Action>) {
