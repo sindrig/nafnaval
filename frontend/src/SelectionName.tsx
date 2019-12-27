@@ -25,7 +25,7 @@ const Name: React.FC<Props> = ({ name, reject, select }: Props) => {
   const { t } = useTranslation();
   return (
     <div className="selection-name-container">
-      <div className="selection-name"><h1>{name}</h1></div>
+      <div className="selection-name"><span>{name}</span></div>
       <button className="selection-button selection-select" onClick={() => select(name)}>{t('Select')}</button>
       <button className="selection-button selection-reject" onClick={() => reject(name)}>{t('Reject')}</button>
     </div>

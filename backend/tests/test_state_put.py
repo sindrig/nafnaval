@@ -89,6 +89,6 @@ def test_create_state(uuid_patch, dynamodb, ses):
 
     assert state['statusCode'] == 200
     assert state['body'] == json.dumps(
-        {'Location': f'https://nafnaval.is/some-uuid'}
+        {'stateId': 'some-uuid'}
     )
     assert ses.get_send_quota()['SentLast24Hours'] == 2

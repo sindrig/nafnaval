@@ -81,7 +81,7 @@ class StateHandler:
             template = f.read()
         self._send_email(email1, state_id, template)
         self._send_email(email2, counterpart, template)
-        return response({'Location': urljoin(FRONTEND_URL, state_id)},)
+        return response({'stateId': state_id})
 
     def post(self, request):
         state_id = self._get_state_id(request)

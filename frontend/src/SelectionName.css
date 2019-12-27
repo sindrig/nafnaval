@@ -1,14 +1,20 @@
-.selection-name-container > .selection-name {
+.selection-name-container {
+    height: 80vh;
 }
 
-.selection-name-container > .selection-name h1 {
-  font-size: 6vw;
-  text-align: center;
+.selection-name-container > .selection-name {
+    height: 50%;
+    text-align: center;
+}
+
+.selection-name-container > .selection-name span {
+    font-size: 6vw;
+    font-weight: bold
 }
 
 .selection-name-container > button.selection-button {
     width: 50%;
-    height: 4vw;
+    height: 50%;
     font-size: 3vw;
     border: 0;
     cursor: pointer;
