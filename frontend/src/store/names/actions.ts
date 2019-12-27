@@ -8,20 +8,16 @@ export function getNames(id: string): (dispatch: Dispatch<NameActionTypes>) => P
     return async (dispatch: Dispatch<NameActionTypes>) => {
         dispatch({type: GET_NAMES_STARTED});
 
-        try {
-            const payload = await getNameState(id);
-            dispatch({
-                type: GET_NAMES_DONE,
-                payload: {
-                    remaining: fromJS(payload.Remaining),
-                    rejected: fromJS(payload.Rejected || []),
-                    selected: fromJS(payload.Selected || []),
-                    stateId: payload.StateId,
-               }
-            });
-        } catch (e) {
-            console.error(e);
-        }
+        const payload = await getNameState(id);
+        dispatch({
+            type: GET_NAMES_DONE,
+            payload: {
+                remaining: fromJS(payload.Remaining),
+                rejected: fromJS(payload.Rejected || []),
+                selected: fromJS(payload.Selected || []),
+                stateId: payload.StateId,
+           }
+        });
     }
 }
 
@@ -29,12 +25,9 @@ export function signUp(email1: string, email2: string, sex: string): (dispatch: 
     return async (dispatch: Dispatch<NameActionTypes>) => {
         dispatch({type: GET_NAMES_STARTED});
 
-        try {
-            const payload = await createState(email1, email2, sex);
-            window.location.href = payload.Location;
-        } catch (e) {
-            console.error(e);
-        }
+        const payload = await createState(email1, email2, sex);
+        // TODO: Use react router?
+        window.location.href = payload.Location;
     }
 }
 
@@ -70,5 +63,15 @@ export function saveSelections(id: string, selections: List<NameSelection>): (di
             .map(({ name }) => name)
             .toJS();
         const payload = await selectNames(id, select, reject);
+        // TODO: Re-use with getNames above
+        dispatch({
+            type: GET_NAMES_DONE,
+            payload: {
+                remaining: fromJS(payload.Remaining),
+                rejected: fromJS(payload.Rejected || []),
+                selected: fromJS(payload.Selected || []),
+                selections: List(),
+           }
+        });
     }
 }
