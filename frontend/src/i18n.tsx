@@ -6,6 +6,7 @@ const resources = {
     translation: {
       'Your e-mail': 'Your e-mail',
       'Partner e-mail': 'Partner e-mail',
+      'Sign up': 'Sign up',
       'Submit': 'Submit',
       'Male': 'Boy',
       'Female': 'Girl',
@@ -19,6 +20,7 @@ const resources = {
     translation: {
       'Your e-mail': 'Þinn tölvupóstur',
       'Partner e-mail': 'Tölvupóstur maka',
+      'Sign up': 'Nýskráning',
       'Submit': 'Byrja!',
       'Male': 'Drengur',
       'Female': 'Stúlka',

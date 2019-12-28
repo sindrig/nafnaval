@@ -14,6 +14,7 @@ import Selection from './Selection';
 import Signup from './Signup';
 import NavBar from './NavBar';
 import ShowSelection, { SelectionType} from './ShowSelection';
+import CssBaseline from '@material-ui/core/CssBaseline';
 import './App.css';
 
 function mapStateToProps(state: IStoreState) {
@@ -34,35 +35,34 @@ const App: React.FC<Props> = (props: Props) => {
   const { t } = useTranslation();
   return (
       <Router>
-        <div>
-          <LoadingOverlay
-            active={props.initializing}
-            spinner
-            text={t('Loading...')}
-          >
-            <NavBar />
-            <div className="app-container">
-              <Switch>
-                <Route path={`/${idMatch}/selected`}>
-                  <ShowSelection selection={SelectionType.selected} />
-                </Route>
-                <Route path={`/${idMatch}/rejected`}>
-                  <ShowSelection selection={SelectionType.rejected} />
-                </Route>
-                <Route path={`/${idMatch}`}>
-                  <Selection />
-                </Route>
-                <Route path="/about">
-                  <div>TODO ABOUT</div>
-                </Route>
-                <Route path="/">
-                  <Signup />
-                </Route>
-              </Switch>
-             </div>
-          </LoadingOverlay>
-        </div>
-      </Router>
+        <CssBaseline />
+        <LoadingOverlay
+          active={props.initializing}
+          spinner
+          text={t('Loading...')}
+        >
+          <NavBar />
+          <div className="app-container">
+            <Switch>
+              <Route path={`/${idMatch}/selected`}>
+                <ShowSelection selection={SelectionType.selected} />
+              </Route>
+              <Route path={`/${idMatch}/rejected`}>
+                <ShowSelection selection={SelectionType.rejected} />
+              </Route>
+              <Route path={`/${idMatch}`}>
+                <Selection />
+              </Route>
+              <Route path="/about">
+                <div>TODO ABOUT</div>
+              </Route>
+              <Route path="/">
+                <Signup />
+              </Route>
+            </Switch>
+           </div>
+        </LoadingOverlay>
+    </Router>
     );
 }
 

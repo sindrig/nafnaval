@@ -49,13 +49,13 @@ class StateHandler:
     def put(self, request):
         email1 = self._get_and_validate_email(request.body, 'email1')
         email2 = self._get_and_validate_email(request.body, 'email2')
-        sex = request.body.get('sex')
-        if sex not in (names.MALE, names.FEMALE):
+        gender = request.body.get('gender')
+        if gender not in (names.MALE, names.FEMALE):
             raise BadInput(
-                'Missing or invalid sex (either '
+                'Missing or invalid gender (either '
                 f'"{names.MALE}" or "{names.FEMALE}")'
             )
-        name_list = names.get(sex)
+        name_list = names.get(gender)
         state_id = str(uuid.uuid4())
         counterpart = str(uuid.uuid4())
         print(f'Creating states {state_id} and {counterpart}')

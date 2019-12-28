@@ -38,7 +38,7 @@ def test_invalid_emails():
     assert exc.value.error == 'Invalid email "blah"'
 
 
-def test_missing_sex():
+def test_missing_gender():
     handler = StateHandler()
     request = Request(
         path='',
@@ -49,18 +49,18 @@ def test_missing_sex():
         handler.put(request)
 
     assert (
-        exc.value.error == 'Missing or invalid sex (either "male" or "female")'
+        exc.value.error == 'Missing or invalid gender (either "male" or "female")'
     )
 
 
-def test_invalid_sex():
+def test_invalid_gender():
     handler = StateHandler()
     request = Request(
         path='',
         body={
             'email1': 'sindri@nafnaval.is',
             'email2': 'sindri@irdn.is',
-            'sex': 'invalid',
+            'gender': 'invalid',
         },
     )
 
@@ -68,7 +68,7 @@ def test_invalid_sex():
         handler.put(request)
 
     assert (
-        exc.value.error == 'Missing or invalid sex (either "male" or "female")'
+        exc.value.error == 'Missing or invalid gender (either "male" or "female")'
     )
 
 
@@ -81,7 +81,7 @@ def test_create_state(uuid_patch, dynamodb, ses):
         body={
             'email1': 'sindri@nafnaval.is',
             'email2': 'sindri@irdn.is',
-            'sex': 'male',
+            'gender': 'male',
         },
     )
 

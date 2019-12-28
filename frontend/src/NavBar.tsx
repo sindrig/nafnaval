@@ -76,7 +76,6 @@ const NavBar: React.FC<Props> = ({ location, selections, save, stateId }: Props)
             iconButtonElement={<IconButton><MoreVertIcon /></IconButton>}
             anchorOrigin={{ horizontal: 'right', vertical: 'top' }}
             targetOrigin={{ horizontal: 'right', vertical: 'top' }}
-            iconStyle={{ fill: 'rgba(0, 0, 0, 0.87)' }}
           >
             <MenuItem primaryText="Íslenska" onClick={() => i18n.changeLanguage('is')} />
             <MenuItem primaryText="English" onClick={() => i18n.changeLanguage('en')} />

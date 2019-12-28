@@ -65,12 +65,12 @@ export const selectNames = async (id: string, select: Array<string>, reject: Arr
   }
 }
 
-export const createState = async (email1: string, email2: string, sex: string): Promise<CreateStateResponse> => {
+export const createState = async (email1: string, email2: string, gender: string): Promise<CreateStateResponse> => {
   if (process.env.NODE_ENV === "development") {
     return new Promise(resolve => resolve({stateId: 'd0391b6c-a5df-4597-993c-1dac2dca8bc4'}));
   }
   try {
-    const response = await apiClient.put<CreateStateResponse>(`/state/`, {email1, email2, sex});
+    const response = await apiClient.put<CreateStateResponse>(`/state/`, {email1, email2, gender});
     return response.data;
   } catch (err) {
     if (err && err.response) {

@@ -7,6 +7,6 @@ MALE = 'male'
 FEMALE = 'female'
 
 
-def get(sex):
-    with open(os.path.join(BASE, f'{sex}.json'), 'r') as f:
+def get(gender):
+    with open(os.path.join(BASE, f'{gender}.json'), 'r') as f:
         return set(json.loads(f.read()))

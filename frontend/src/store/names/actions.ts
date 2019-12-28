@@ -21,11 +21,11 @@ export function getNames(id: string): (dispatch: Dispatch<NameActionTypes>) => P
     }
 }
 
-export function signUp(email1: string, email2: string, sex: string): (dispatch: Dispatch<NameActionTypes>) => Promise<void> {
+export function signUp(email1: string, email2: string, gender: string): (dispatch: Dispatch<NameActionTypes>) => Promise<void> {
     return async (dispatch: Dispatch<NameActionTypes>) => {
         dispatch({type: LOADING});
 
-        const { stateId } = await createState(email1, email2, sex);
+        const { stateId } = await createState(email1, email2, gender);
         dispatch({
             type: SIGNUP_DONE,
             payload: {stateId},
