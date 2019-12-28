@@ -16,6 +16,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import SaveIcon from '@material-ui/icons/Save';
 import { UUID_REGEX } from './constants';
+import Chip from '@material-ui/core/Chip';
 import { List } from 'immutable';
 import { NameSelection } from './store/names/types';
 import './NavBar.css'
@@ -26,8 +27,8 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-function mapStateToProps({ names: { selections, stateId }}: IStoreState) {
-  return { selections, stateId };
+function mapStateToProps({ names: { selections, stateId, progress }}: IStoreState) {
+  return { selections, stateId, progress };
 }
 
 
@@ -43,10 +44,12 @@ interface Props extends RouteComponentProps<any> {
   selections: List<NameSelection>
   save: Function
   stateId?: string
+  progress: number
 }
 
-const NavBar: React.FC<Props> = ({ location, selections, save, stateId }: Props) => {
+const NavBar: React.FC<Props> = ({ location, selections, save, stateId, progress }: Props) => {
   const match = location.pathname.match(`/(?<id>${UUID_REGEX})`)
+  const state = match?.groups?.id || stateId;
   const { i18n, t } = useTranslation();
   const [menuOpen, setMenuOpen] = useState(false);
   const openMenu = () => setMenuOpen(true);
@@ -59,9 +62,10 @@ const NavBar: React.FC<Props> = ({ location, selections, save, stateId }: Props)
         onTitleClick={(openMenu)}
         iconElementLeft={<FontIcon onClick={(openMenu)} className="material-icons">menu</FontIcon>}
       >
-        <LeftDrawer open={menuOpen} closeMenu={closeMenu} stateId={stateId || match?.groups?.id}/>
+        <LeftDrawer open={menuOpen} closeMenu={closeMenu} stateId={state}/>
         <span className="navigation-toolbar">
-          {selections.size && match?.groups?.id ?
+          {state ? <Chip label={`${Math.floor(progress * 100)}%`} /> : null}
+          {selections.size && state ?
             <Button
               variant="contained"
               color="primary"

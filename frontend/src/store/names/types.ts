@@ -26,6 +26,7 @@ export interface NameState extends Names {
     error: boolean
     // Local name selections
     selections: List<NameSelection>
+    progress: number
 }
 
 

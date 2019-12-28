@@ -14,8 +14,19 @@ const initialState: NameState = {
   selected: List(),
   rejected: List(),
   selections: List(),
+  progress: 0,
   initializing: false,
   error: false,
+}
+
+const getProgress = (state: NameState) => {
+    const totalNames = (
+      state.remaining.size +
+      state.selected.size +
+      state.rejected.size +
+      state.selections.size
+    );
+    return (totalNames - state.remaining.size) / totalNames;
 }
 
 export default function nameReducer(
@@ -29,7 +40,7 @@ export default function nameReducer(
             initializing: true,
         }
     case GET_NAMES_DONE:
-        return {
+        const newStateGetNames = {
             ...state,
             initializing: false,
             error: false,
@@ -37,12 +48,16 @@ export default function nameReducer(
             selections: List(),
             ...action.payload
         }
+        newStateGetNames.progress = getProgress(newStateGetNames);
+        return newStateGetNames;
     case NAME_SELECTED:
-      return {
+      const newStateNameSelected = {
         ...state,
         remaining: state.remaining.filter(name => name !== action.payload.name),
         selections: state.selections.push(action.payload),
       }
+      newStateNameSelected.progress = getProgress(newStateNameSelected);
+      return newStateNameSelected;
     case SIGNUP_DONE:
       return {
         ...state,
