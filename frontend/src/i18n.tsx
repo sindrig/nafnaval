@@ -15,6 +15,9 @@ const resources = {
       'Select': 'Select',
       'Reject': 'Reject',
       'Save': 'Save',
+      'View selected': 'View selected',
+      'View rejected': 'View rejected',
+      'About': 'About',
     },
   },
   is: {
@@ -29,6 +32,9 @@ const resources = {
       'Select': 'Velja',
       'Reject': 'Hafna',
       'Save': 'Vista',
+      'View selected': 'Valin nöfn',
+      'View rejected': 'Höfnuð nöfn',
+      'About': 'Um síðuna',
     },
   },
 };
