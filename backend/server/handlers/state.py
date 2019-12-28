@@ -31,21 +31,14 @@ class StateHandler:
 
     def get(self, request):
         state_id = self._get_state_id(request)
-        if '/' in request.path and request.path.split('/', 1)[-1]:
-            wanted_attributes = request.path.split('/')[1:]
-        else:
-            wanted_attributes = ['remaining']
         attrs = [
             'StateId',
             'Counterpart',
             'Email',
+            'Selected',
+            'Rejected',
+            'Remaining',
         ]
-        if 'selected' in wanted_attributes:
-            attrs.append('Selected')
-        if 'rejected' in wanted_attributes:
-            attrs.append('Rejected')
-        if 'remaining' in wanted_attributes:
-            attrs.append('Remaining')
         result = self.name_table.get_item(
             Key={'StateId': state_id}, ProjectionExpression=','.join(attrs)
         )
