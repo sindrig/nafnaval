@@ -34,7 +34,6 @@ class StateHandler:
         state_id = self._get_state_id(request)
         attrs = [
             'StateId',
-            'Counterpart',
             'Email',
             'Selected',
             'Rejected',
@@ -161,7 +160,4 @@ class StateHandler:
                     random.shuffle(result[k])
             else:
                 result[k] = v
-        return {
-            k: list(v - _blank_set) if isinstance(v, set) else v
-            for k, v in item.items()
-        }
+        return result
