@@ -1,23 +1,21 @@
 import React from 'react';
-import { RouteComponentProps, withRouter, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
-import { UUID_REGEX } from './constants';
 import Drawer from 'material-ui/Drawer';
 import MenuItem from 'material-ui/MenuItem';
 
 
-interface Props extends RouteComponentProps<any> {
+interface Props {
   open: boolean
   closeMenu: () => void
+  stateId?: string
 }
 
 
-const LeftDrawer: React.FC<Props> = ({ closeMenu, open, location}: Props) => {
+const LeftDrawer: React.FC<Props> = ({ closeMenu, open, stateId }: Props) => {
   const { t } = useTranslation();
   const links = [];
-  const match = location.pathname.match(`/(?<id>${UUID_REGEX})`)
-  if ( match && match.groups) {
-    const stateId = match.groups.id;
+  if ( stateId ) {
     links.push(
       <Link to={`/${stateId}`} key="stateHome">
         <MenuItem onClick={closeMenu}>
@@ -60,4 +58,4 @@ const LeftDrawer: React.FC<Props> = ({ closeMenu, open, location}: Props) => {
    )
 }
 
-export default withRouter(LeftDrawer);
+export default LeftDrawer;

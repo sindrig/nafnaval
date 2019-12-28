@@ -31,7 +31,7 @@ type Props = PropsFromRedux & {
 const idMatch = `:id(${UUID_REGEX})`;
 
 const App: React.FC<Props> = (props: Props) => {
-  const { i18n, t } = useTranslation();
+  const { t } = useTranslation();
   return (
       <Router>
         <div>
@@ -41,10 +41,6 @@ const App: React.FC<Props> = (props: Props) => {
             text={t('Loading...')}
           >
             <NavBar />
-            <div className="language-selector">
-              <button onClick={() => i18n.changeLanguage('is')}>is</button>
-              <button onClick={() => i18n.changeLanguage('en')}>en</button>
-            </div>
             <Switch>
               <Route path={`/${idMatch}/selected`}>
                 <ShowSelection selection={SelectionType.selected} />

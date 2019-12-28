@@ -12,6 +12,7 @@ const resources = {
       'Loading...': 'Loading...',
       'Select': 'Select',
       'Reject': 'Reject',
+      'Save': 'Save',
     },
   },
   is: {
@@ -24,6 +25,7 @@ const resources = {
       'Loading...': 'Hleð...',
       'Select': 'Velja',
       'Reject': 'Hafna',
+      'Save': 'Vista',
     },
   },
 };
