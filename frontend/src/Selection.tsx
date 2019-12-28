@@ -5,7 +5,7 @@ import { Dispatch, Action, bindActionCreators } from 'redux';
 import { List } from 'immutable';
 import { IStoreState } from './store/reducer';
 import { getNames as getNamesAction } from './store/names/actions';
-import Name from './SelectionName';
+import SelectionName from './SelectionName';
 import './Selection.css'
 
 
@@ -23,7 +23,7 @@ const Selection: React.FC<SelectionProps> = ({getNames, remaining}: SelectionPro
   }
   return (
     <div className="selection">
-      <Name name={remaining.get(0) || ''} />
+      <SelectionName name={remaining.get(0)!} />
     </div>
   )
 }

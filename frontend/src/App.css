@@ -3,3 +3,11 @@
   top: 2px;
   right: 2px;
 }
+
+.app-container {
+  height: 90vh;
+}
+
+.app-container > div {
+  height: 100%;
+}

@@ -21,7 +21,7 @@ type Props = PropsFromRedux & {
   name: string
 }
 
-const Name: React.FC<Props> = ({ name, reject, select }: Props) => {
+const SelectionName: React.FC<Props> = ({ name, reject, select }: Props) => {
   const { t } = useTranslation();
   return (
     <div className="selection-name-container">
@@ -33,4 +33,4 @@ const Name: React.FC<Props> = ({ name, reject, select }: Props) => {
 }
 
 
-export default connector(Name)
+export default connector(SelectionName)

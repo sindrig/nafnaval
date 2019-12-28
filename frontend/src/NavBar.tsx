@@ -26,8 +26,8 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-function mapStateToProps({ names: { selections }}: IStoreState) {
-  return { selections };
+function mapStateToProps({ names: { selections, stateId }}: IStoreState) {
+  return { selections, stateId };
 }
 
 
@@ -42,9 +42,10 @@ const connector = connect(mapStateToProps, mapDispatchToProps);
 interface Props extends RouteComponentProps<any> {
   selections: List<NameSelection>
   save: Function
+  stateId?: string
 }
 
-const NavBar: React.FC<Props> = ({ location, selections, save }: Props) => {
+const NavBar: React.FC<Props> = ({ location, selections, save, stateId }: Props) => {
   const match = location.pathname.match(`/(?<id>${UUID_REGEX})`)
   const { i18n, t } = useTranslation();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -58,7 +59,7 @@ const NavBar: React.FC<Props> = ({ location, selections, save }: Props) => {
         onTitleClick={(openMenu)}
         iconElementLeft={<FontIcon onClick={(openMenu)} className="material-icons">menu</FontIcon>}
       >
-        <LeftDrawer open={menuOpen} closeMenu={closeMenu} stateId={match?.groups?.id}/>
+        <LeftDrawer open={menuOpen} closeMenu={closeMenu} stateId={stateId || match?.groups?.id}/>
         <span className="navigation-toolbar">
           {selections.size && match?.groups?.id ?
             <Button
