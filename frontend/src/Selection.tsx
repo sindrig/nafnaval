@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
-import { RouteComponentProps, withRouter } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { Dispatch, Action, bindActionCreators } from 'redux';
 import { List } from 'immutable';
 import { IStoreState } from './store/reducer';
@@ -10,14 +10,15 @@ import SelectionSave from './SelectionSave';
 import './Selection.css'
 
 
-interface SelectionProps extends RouteComponentProps<any> {
+interface SelectionProps {
   remaining: List<string>
   getNames: (id: string) => (dispatch: Dispatch<Action>) => Promise<void>
 }
 
 
-const Selection: React.FC<SelectionProps> = ({getNames, remaining, match: { params }}: SelectionProps) => {
-  useEffect(() => {getNames(params.id)}, [getNames, params.id]);
+const Selection: React.FC<SelectionProps> = ({getNames, remaining}: SelectionProps) => {
+  const { id } = useParams();
+  useEffect(() => {getNames(id!)}, [getNames, id]);
   if ( remaining.size === 0 ) {
     return <div>All done... TODO</div>
   }
@@ -40,6 +41,4 @@ function mapDispatchToProps(dispatch: Dispatch<Action>) {
   };
 }
 
-export default withRouter(
-  connect(mapStateToProps, mapDispatchToProps)(Selection)
-) as React.ComponentClass<{}>;
+export default connect(mapStateToProps, mapDispatchToProps)(Selection)

@@ -9,9 +9,11 @@ import { useTranslation } from 'react-i18next';
 // @ts-ignore
 import LoadingOverlay from 'react-loading-overlay';
 import { IStoreState } from './store/reducer';
+import { UUID_REGEX } from './constants';
 import Selection from './Selection';
 import Signup from './Signup';
 import NavBar from './NavBar';
+import ShowSelection, { SelectionType} from './ShowSelection';
 import './App.css';
 
 function mapStateToProps(state: IStoreState) {
@@ -26,6 +28,7 @@ type Props = PropsFromRedux & {
   initializing: boolean
 }
 
+const idMatch = `:id(${UUID_REGEX})`;
 
 const App: React.FC<Props> = (props: Props) => {
   const { i18n, t } = useTranslation();
@@ -42,11 +45,18 @@ const App: React.FC<Props> = (props: Props) => {
               <button onClick={() => i18n.changeLanguage('is')}>is</button>
               <button onClick={() => i18n.changeLanguage('en')}>en</button>
             </div>
-            {/* A <Switch> looks through its children <Route>s and
-                renders the first one that matches the current URL. */}
             <Switch>
-              <Route path="/:id([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})">
+              <Route path={`/${idMatch}/selected`}>
+                <ShowSelection selection={SelectionType.selected} />
+              </Route>
+              <Route path={`/${idMatch}/rejected`}>
+                <ShowSelection selection={SelectionType.rejected} />
+              </Route>
+              <Route path={`/${idMatch}`}>
                 <Selection />
+              </Route>
+              <Route path="/about">
+                <div>TODO ABOUT</div>
               </Route>
               <Route path="/">
                 <Signup />
