@@ -1,4 +1,5 @@
 import os
+import random
 import time
 import uuid
 import re
@@ -151,6 +152,15 @@ class StateHandler:
         print(f'Sent email with message id {response["MessageId"]}')
 
     def _serializable(self, item):
+        result = {}
+        for k, v in item.items():
+            if isinstance(v, set):
+                result[k] = list(v - _blank_set)
+                # We want to have Remaining shuffled always
+                if k == 'Remaining':
+                    random.shuffle(result[k])
+            else:
+                result[k] = v
         return {
             k: list(v - _blank_set) if isinstance(v, set) else v
             for k, v in item.items()
