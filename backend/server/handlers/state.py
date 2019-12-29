@@ -1,4 +1,5 @@
 import os
+import decimal
 import random
 import time
 import uuid
@@ -158,6 +159,8 @@ class StateHandler:
                 # We want to have Remaining shuffled always
                 if k == 'Remaining':
                     random.shuffle(result[k])
+            elif isinstance(v, decimal.Decimal):
+                result[k] = float(v)
             else:
                 result[k] = v
         return result

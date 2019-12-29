@@ -62,4 +62,4 @@ def test_select_names(dynamodb):
     body = json.loads(response['body'])
     assert 'Guðmundur' not in body['Remaining']
     assert sorted(body['Selected']) == sorted(['Sindri', 'Óttar', 'Guðmundur'])
-    assert 'Rejected' not in body
+    assert body['Rejected'] == ['Aðalráður']
