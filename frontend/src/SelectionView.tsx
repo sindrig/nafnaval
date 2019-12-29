@@ -1,9 +1,15 @@
 import React from 'react';
+import { Redirect } from 'react-router-dom';
 import { connect, ConnectedProps } from 'react-redux';
 import { Dispatch, Action, bindActionCreators } from 'redux';
+import { IStoreState } from './store/reducer';
 import { rejectName, selectName } from './store/names/actions';
 import { useTranslation } from 'react-i18next';
-import './SelectionName.css'
+import './SelectionView.css'
+
+function mapStateToProps({ names: { remaining, progress }}: IStoreState) {
+  return { name: remaining.get(0), progress };
+}
 
 function mapDispatchToProps(dispatch: Dispatch<Action>) {
   return {
@@ -12,17 +18,24 @@ function mapDispatchToProps(dispatch: Dispatch<Action>) {
   };
 }
 
-const connector = connect(null, mapDispatchToProps)
+const connector = connect(mapStateToProps, mapDispatchToProps)
 
 type PropsFromRedux = ConnectedProps<typeof connector>
 type Props = PropsFromRedux & {
   select: Function
   reject: Function
-  name: string
+  name?: string
+  progress: number
 }
 
-const SelectionName: React.FC<Props> = ({ name, reject, select }: Props) => {
+const SelectionView: React.FC<Props> = ({ name, reject, select, progress }: Props) => {
   const { t } = useTranslation();
+  if (!name) {
+    if (progress) {
+      return <Redirect to="/done" />
+    }
+    return <div>{t('Loading...')}</div>
+  }
   return (
     <div className="selection-name-container">
       <div className="selection-name"><span>{name}</span></div>
@@ -33,4 +46,4 @@ const SelectionName: React.FC<Props> = ({ name, reject, select }: Props) => {
 }
 
 
-export default connector(SelectionName)
+export default connector(SelectionView)

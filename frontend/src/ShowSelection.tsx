@@ -78,7 +78,7 @@ const ShowSelection: React.FC<Props> = ({selected, rejected, selection}: Props) 
                 <List dense={dense}>
                   {nameMap.get(letter)!.map(name => {
                     return (
-                      <ListItem>
+                      <ListItem key={name}>
                         <ListItemText
                           primary={name}
                         />

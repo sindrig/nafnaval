@@ -1,25 +1,39 @@
 import React, { useEffect } from 'react';
+import {
+  Switch,
+  Route,
+} from 'react-router-dom';
 import { Prompt } from 'react-router'
 import { connect } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import { useParams } from "react-router-dom";
+import { useParams, withRouter, RouteComponentProps } from "react-router-dom";
 import { Dispatch, Action, bindActionCreators } from 'redux';
 import { List } from 'immutable';
 import { IStoreState } from './store/reducer';
 import { getNames as getNamesAction } from './store/names/actions';
 import { NameSelection } from './store/names/types';
-import SelectionName from './SelectionName';
-import './Selection.css'
+import SelectionView from './SelectionView';
+import ShowSelection, { SelectionType } from './ShowSelection';
 
 
-interface SelectionProps {
-  remaining: List<string>
+interface SelectionProps extends RouteComponentProps<any>{
   selections: List<NameSelection>
   getNames: (id: string) => (dispatch: Dispatch<Action>) => Promise<void>
 }
 
+function mapStateToProps({ names: { selections }}: IStoreState) {
+  return { selections };
+}
 
-const Selection: React.FC<SelectionProps> = ({getNames, remaining, selections}: SelectionProps) => {
+function mapDispatchToProps(dispatch: Dispatch<Action>) {
+  return {
+    getNames: bindActionCreators(getNamesAction, dispatch)
+  };
+}
+
+const connector = connect(mapStateToProps, mapDispatchToProps);
+
+const Selection: React.FC<SelectionProps> = ({getNames, selections, match}: SelectionProps) => {
   const { t } = useTranslation();
   const { id } = useParams();
   useEffect(() => {getNames(id!)}, [getNames, id]);
@@ -30,29 +44,28 @@ const Selection: React.FC<SelectionProps> = ({getNames, remaining, selections}: 
       window.onbeforeunload = null
     }}, [selections.size]
   )
-  if ( remaining.size === 0 ) {
-    return <div>All done... TODO</div>
-  }
   return (
     <React.Fragment>
       <Prompt
         when={selections.size > 0}
         message={t('Unsaved?')}
       />
-      <SelectionName name={remaining.get(0)!} />
+
+      <Switch>
+        <Route path={`${match.path}/selected`}>
+          <ShowSelection selection={SelectionType.selected} />
+        </Route>
+        <Route path={`${match.path}/rejected`}>
+          <ShowSelection selection={SelectionType.rejected} />
+        </Route>
+        <Route path={`${match.path}/`}>
+          <SelectionView />
+        </Route>
+      </Switch>
     </React.Fragment>
   )
 }
 
 
-function mapStateToProps({ names: { remaining, selections }}: IStoreState) {
-  return { remaining, selections };
-}
 
-function mapDispatchToProps(dispatch: Dispatch<Action>) {
-  return {
-    getNames: bindActionCreators(getNamesAction, dispatch)
-  };
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(Selection)
+export default withRouter(connector(Selection))
