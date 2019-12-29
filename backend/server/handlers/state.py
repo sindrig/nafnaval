@@ -101,7 +101,7 @@ class StateHandler:
                 Key={'StateId': state_id},
                 UpdateExpression=update_expression,
                 ExpressionAttributeValues=attribute_values,
-                ReturnValues='UPDATED_NEW',
+                ReturnValues='ALL_NEW',
                 ConditionExpression='StateId = :state_id',
             )
         except botocore.exceptions.ClientError as e:

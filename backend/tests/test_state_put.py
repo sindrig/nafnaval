@@ -48,9 +48,8 @@ def test_missing_gender():
     with pytest.raises(BadInput) as exc:
         handler.put(request)
 
-    assert (
-        exc.value.error == 'Missing or invalid gender (either "male" or "female")'
-    )
+    exp_err = 'Missing or invalid gender (either "male" or "female")'
+    assert exc.value.error == exp_err
 
 
 def test_invalid_gender():
@@ -68,7 +67,8 @@ def test_invalid_gender():
         handler.put(request)
 
     assert (
-        exc.value.error == 'Missing or invalid gender (either "male" or "female")'
+        exc.value.error
+        == 'Missing or invalid gender (either "male" or "female")'
     )
 
 
@@ -88,7 +88,5 @@ def test_create_state(uuid_patch, dynamodb, ses):
     state = handler.put(request)
 
     assert state['statusCode'] == 200
-    assert state['body'] == json.dumps(
-        {'stateId': 'some-uuid'}
-    )
+    assert state['body'] == json.dumps({'stateId': 'some-uuid'})
     assert ses.get_send_quota()['SentLast24Hours'] == 2
