@@ -67,9 +67,7 @@ def test_invalid_gender():
         handler.put(request)
 
     exp_err = 'Missing or invalid gender (either "male" or "female")'
-    assert (
-        exc.value.error == exp_err
-    )
+    assert exc.value.error == exp_err
 
 
 @patch('server.handlers.state.uuid')
