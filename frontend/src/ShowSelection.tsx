@@ -46,7 +46,9 @@ type Props = PropsFromRedux & {
   selection: SelectionType
 }
 
-
+const localeComparer = (a: string, b: string) => {
+    return a.localeCompare(b)
+};
 
 const ShowSelection: React.FC<Props> = ({selected, rejected, selection}: Props) => {
   const { t } = useTranslation();
@@ -54,7 +56,7 @@ const ShowSelection: React.FC<Props> = ({selected, rejected, selection}: Props) 
   const nameList = selection === SelectionType.selected ? selected : rejected;
   const select = (name: string) => console.log(name);
   let nameMap = OrderedMap<string, ImmutableList<string>>();
-  nameList.sort().forEach(name => {
+  nameList.sort(localeComparer).forEach(name => {
     const key = name.substr(0, 1);
     const currentMap = nameMap.get(key);
     if ( currentMap ) {
