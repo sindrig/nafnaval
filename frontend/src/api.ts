@@ -55,7 +55,7 @@ export const selectNames = async (id: string, select: Array<string>, reject: Arr
     });
   }
   try {
-    const response = await apiClient.post<NamesResponse>(`/state/${id}`, {select, reject});
+    const response = await apiClient.post<NamesResponse>(`/state/${id}`, {select, reject, action: 'save'});
     return response.data;
   } catch (err) {
     if (err && err.response) {

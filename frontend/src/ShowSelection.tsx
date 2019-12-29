@@ -52,7 +52,6 @@ const ShowSelection: React.FC<Props> = ({selected, rejected, selection}: Props) 
   const { t } = useTranslation();
   const classes = useStyles();
   const nameList = selection === SelectionType.selected ? selected : rejected;
-  const dense = true;
   const select = (name: string) => console.log(name);
   let nameMap = OrderedMap<string, ImmutableList<string>>();
   nameList.sort().forEach(name => {
@@ -70,12 +69,12 @@ const ShowSelection: React.FC<Props> = ({selected, rejected, selection}: Props) 
       <Grid container spacing={2}>
         {nameMap.keySeq().map((letter) => {
           return (
-            <Grid item xs={6} md={3} key={letter}>
+            <Grid item xs={4} md={2} key={letter}>
               <Typography variant="h6" className={classes.title}>
                 {letter}
               </Typography>
               <div className={classes.demo}>
-                <List dense={dense}>
+                <List dense>
                   {nameMap.get(letter)!.map(name => {
                     return (
                       <ListItem key={name}>

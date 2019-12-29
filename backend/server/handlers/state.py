@@ -79,24 +79,70 @@ class StateHandler:
 
     def post(self, request):
         state_id = self._get_state_id(request)
-        selected = set(request.body.get('select', []))
-        rejected = set(request.body.get('reject', []))
-        if not selected and not rejected:
-            raise BadInput('Nothing to select or reject')
-        adds = []
-        attribute_values = {
-            ':bodyitems': selected.union(rejected),
-            ':state_id': state_id,
-        }
-        if selected:
-            adds.append('Selected :selected')
-            attribute_values[':selected'] = selected
-        if rejected:
-            adds.append('Rejected :rejected')
-            attribute_values[':rejected'] = rejected
-        update_expression = (
-            'DELETE Remaining :bodyitems ' f'ADD {", ".join(adds)}'
-        )
+        # TODO: Do not default action
+        # TODO: Migrate save to movements?
+        if request.body.get('action', 'save') == 'save':
+            selected = set(request.body.get('select', []))
+            rejected = set(request.body.get('reject', []))
+            if not selected and not rejected:
+                raise BadInput('Nothing to select or reject')
+            adds = []
+            attribute_values = {
+                ':bodyitems': selected.union(rejected),
+                ':state_id': state_id,
+            }
+            if selected:
+                adds.append('Selected :selected')
+                attribute_values[':selected'] = selected
+            if rejected:
+                adds.append('Rejected :rejected')
+                attribute_values[':rejected'] = rejected
+            update_expression = (
+                f'DELETE Remaining :bodyitems ADD {", ".join(adds)}'
+            )
+        elif request.body.get('action') == 'move':
+            movements = request.body.get('movements', [])
+            if not movements:
+                raise BadInput('No movements saved')
+            result = self.name_table.get_item(
+                Key={'StateId': state_id},
+                ProjectionExpression='Remaining,Selected,Rejected',
+            )
+            if 'Item' not in result:
+                raise NotFound(f'State "{state_id}" not found')
+            item = result['Item']
+            deletes = set()
+            adds = set()
+            attribute_values = {
+                ':state_id': state_id,
+            }
+            for movement in movements:
+                if movement.get('name') not in item.get(
+                    movement.get('from'), []
+                ):
+                    raise BadInput(
+                        f'"{movement.get("name")}" not found in '
+                        f'{movement.get("from")}'
+                    )
+                elif 'to' not in movement:
+                    raise BadInput('Missing to parameter in movement')
+                f = movement['from']
+                t = movement['to']
+                name = movement['name']
+                target_delete_key = f':del{f.lower()}'
+                target_add_key = f':add{t.lower()}'
+                if target_delete_key not in attribute_values:
+                    attribute_values[target_delete_key] = set()
+                if target_add_key not in attribute_values:
+                    attribute_values[target_add_key] = set()
+                attribute_values[target_delete_key].add(name)
+                attribute_values[target_add_key].add(name)
+                deletes.add(f'{f} {target_delete_key}')
+                adds.add(f'{t} {target_add_key}')
+            update_expression = (
+                f'DELETE {", ".join(deletes)} ADD {", ".join(adds)}'
+            )
+
         try:
             result = self.name_table.update_item(
                 Key={'StateId': state_id},
