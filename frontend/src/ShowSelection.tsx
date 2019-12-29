@@ -19,7 +19,7 @@ import MenuItem from 'material-ui/MenuItem';
 const useStyles = makeStyles(theme => ({
   root: {
     flexGrow: 1,
-    overflow: 'hidden',
+    overflowX: 'hidden',
   },
   demo: {
     backgroundColor: theme.palette.background.paper,
