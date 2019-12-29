@@ -3,6 +3,7 @@ import {
     LOADING,
     GET_NAMES_DONE,
     NAME_SELECTED,
+    ERROR,
     SIGNUP_DONE,
     NameActionTypes,
 } from './types';
@@ -13,10 +14,10 @@ const initialState: NameState = {
   remaining: List(),
   selected: List(),
   rejected: List(),
-  selections: List(),
+  movements: List(),
   progress: 0,
   initializing: false,
-  error: false,
+  error: null,
 }
 
 const getProgress = (state: NameState) => {
@@ -24,7 +25,7 @@ const getProgress = (state: NameState) => {
       state.remaining.size +
       state.selected.size +
       state.rejected.size +
-      state.selections.size
+      state.movements.size
     );
     return (totalNames - state.remaining.size) / totalNames;
 }
@@ -43,9 +44,9 @@ export default function nameReducer(
         const newStateGetNames = {
             ...state,
             initializing: false,
-            error: false,
+            error: null,
             // Maybe not? Maybe state?
-            selections: List(),
+            movements: List(),
             ...action.payload
         }
         newStateGetNames.progress = getProgress(newStateGetNames);
@@ -54,7 +55,7 @@ export default function nameReducer(
       const newStateNameSelected = {
         ...state,
         remaining: state.remaining.filter(name => name !== action.payload.name),
-        selections: state.selections.push(action.payload),
+        movements: state.movements.push(action.payload),
       }
       newStateNameSelected.progress = getProgress(newStateNameSelected);
       return newStateNameSelected;
@@ -62,6 +63,12 @@ export default function nameReducer(
       return {
         ...state,
         stateId: action.payload.stateId,
+      }
+    case ERROR:
+      return {
+        ...state,
+        initializing: false,
+        error: action.payload.error,
       }
     default:
       return state

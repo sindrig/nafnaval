@@ -16,8 +16,8 @@ import NavBar from './NavBar';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import './App.css';
 
-function mapStateToProps({ names: { initializing }}: IStoreState) {
-  return { initializing };
+function mapStateToProps({ names: { initializing, error }}: IStoreState) {
+  return { initializing, error };
 }
 
 const connector = connect(mapStateToProps);
@@ -25,19 +25,20 @@ const connector = connect(mapStateToProps);
 type PropsFromRedux = ConnectedProps<typeof connector>
 type Props = PropsFromRedux & {
   initializing: boolean
+  error: string | null
 }
 
 const idMatch = `:id(${UUID_REGEX})`;
 
-const App: React.FC<Props> = ({ initializing }: Props) => {
+const App: React.FC<Props> = ({ initializing, error }: Props) => {
   const { t } = useTranslation();
   return (
       <Router>
         <CssBaseline />
         <LoadingOverlay
-          active={initializing}
+          active={initializing || error}
           spinner
-          text={t('Loading...')}
+          text={error || t('Loading...')}
         >
           <NavBar />
           <div className="app-container">

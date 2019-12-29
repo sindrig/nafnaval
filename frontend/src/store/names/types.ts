@@ -1,13 +1,15 @@
 import { List } from 'immutable';
 
-export enum Selection {
-    reject,
-    select
+export enum Bucket {
+    Rejected = 'Rejected',
+    Selected = 'Selected',
+    Remaining = 'Remaining'
 }
 
-export interface NameSelection {
+export interface NameMovement {
     name: string
-    selection: Selection
+    from: Bucket
+    to: Bucket
 }
 
 interface StateId {
@@ -15,23 +17,28 @@ interface StateId {
 }
 
 interface Names {
-    remaining: List<string>,
-    selected: List<string>,
-    rejected: List<string>,
+    remaining: List<string>
+    selected: List<string>
+    rejected: List<string>
     stateId?: string
+    movements: List<NameMovement>
 }
 
 export interface NameState extends Names {
     initializing: boolean
-    error: boolean
-    // Local name selections
-    selections: List<NameSelection>
+    error: string | null
+    // Local name movements
     progress: number
+}
+
+interface ErrorType {
+    error: string
 }
 
 
 
 export const GET_NAMES = 'GET_NAMES';
+export const ERROR = 'ERROR';
 export const LOADING = 'LOADING';
 export const GET_NAMES_DONE = 'GET_NAMES_DONE';
 export const SIGNUP_DONE = 'SIGNUP_DONE';
@@ -48,6 +55,11 @@ interface GetNamesStarted {
     type: typeof LOADING
 }
 
+interface Error {
+    type: typeof ERROR
+    payload: ErrorType
+}
+
 interface GetNamesDone {
     type: typeof GET_NAMES_DONE
     payload: Names
@@ -60,9 +72,9 @@ interface SignupDone {
 
 interface NameSelected {
     type: typeof NAME_SELECTED,
-    payload: NameSelection
+    payload: NameMovement
 }
 
 export type NameActionTypes = (
-    GetNamesAction | GetNamesStarted | GetNamesDone | NameSelected | SignupDone
+    GetNamesAction | GetNamesStarted | GetNamesDone | NameSelected | SignupDone | Error
 )

@@ -202,9 +202,12 @@ class StateHandler:
         for k, v in item.items():
             if isinstance(v, set):
                 result[k] = list(v - _blank_set)
-                # We want to have Remaining shuffled always
                 if k == 'Remaining':
+                    # We want to have Remaining shuffled always
                     random.shuffle(result[k])
+                else:
+                    # Others shold always be in order
+                    result[k] = sorted(result[k])
             elif isinstance(v, decimal.Decimal):
                 result[k] = float(v)
             else:

@@ -3,7 +3,8 @@ import { Redirect } from 'react-router-dom';
 import { connect, ConnectedProps } from 'react-redux';
 import { Dispatch, Action, bindActionCreators } from 'redux';
 import { IStoreState } from './store/reducer';
-import { rejectName, selectName } from './store/names/actions';
+import { moveName } from './store/names/actions';
+import { Bucket } from './store/names/types';
 import { useTranslation } from 'react-i18next';
 import './SelectionView.css'
 
@@ -13,8 +14,8 @@ function mapStateToProps({ names: { remaining, progress }}: IStoreState) {
 
 function mapDispatchToProps(dispatch: Dispatch<Action>) {
   return {
-    select: bindActionCreators(selectName, dispatch),
-    reject: bindActionCreators(rejectName, dispatch)
+    select: bindActionCreators((name) => moveName(name, Bucket.Remaining, Bucket.Selected), dispatch),
+    reject: bindActionCreators((name) => moveName(name, Bucket.Remaining, Bucket.Rejected), dispatch)
   };
 }
 

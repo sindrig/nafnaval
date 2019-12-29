@@ -1,6 +1,6 @@
 import { Dispatch } from 'redux';
-import { LOADING, GET_NAMES_DONE, NAME_SELECTED, SIGNUP_DONE, NameActionTypes, Selection, NameSelection } from './types';
-import { getNameState, createState, selectNames } from '../../api';
+import { LOADING, GET_NAMES_DONE, NAME_SELECTED, ERROR, SIGNUP_DONE, NameActionTypes, Bucket, NameMovement } from './types';
+import { getNameState, createState, saveMovements, NamesResponse, ErrorResponse, CreateStateResponse } from '../../api';
 import { fromJS, List } from 'immutable';
 
 
@@ -9,15 +9,7 @@ export function getNames(id: string): (dispatch: Dispatch<NameActionTypes>) => P
         dispatch({type: LOADING});
 
         const payload = await getNameState(id);
-        dispatch({
-            type: GET_NAMES_DONE,
-            payload: {
-                remaining: fromJS(payload.Remaining),
-                rejected: fromJS(payload.Rejected || []),
-                selected: fromJS(payload.Selected || []),
-                stateId: payload.StateId,
-           }
-        });
+        dispatch(receiveNames(payload));
     }
 }
 
@@ -25,55 +17,61 @@ export function signUp(email1: string, email2: string, gender: string): (dispatc
     return async (dispatch: Dispatch<NameActionTypes>) => {
         dispatch({type: LOADING});
 
-        const { stateId } = await createState(email1, email2, gender);
-        dispatch({
-            type: SIGNUP_DONE,
-            payload: {stateId},
-        })
+        const payload = await createState(email1, email2, gender);
+        if ((payload as ErrorResponse).error) {
+            dispatch(receiveError(payload as ErrorResponse))
+        } else {
+            const {stateId} = (payload as CreateStateResponse);
+            dispatch({
+                type: SIGNUP_DONE,
+                payload: {stateId},
+            })
+        }
     }
 }
 
-function nameSelection(name: string, selection: Selection): (dispatch: Dispatch<NameActionTypes>) => void {
+export function moveName(name: string, from: Bucket, to: Bucket): (dispatch: Dispatch<NameActionTypes>) => void {
     return (dispatch: Dispatch<NameActionTypes>) => {
         dispatch({
             type: NAME_SELECTED,
-            payload: {
-                name,
-                selection,
-            }
+            payload: { name, from, to }
         })
-    }
+    };
 }
 
-export function rejectName(name: string): (dispatch: Dispatch<NameActionTypes>) => void {
-    return nameSelection(name, Selection.reject);
-}
-
-export function selectName(name: string): (dispatch: Dispatch<NameActionTypes>) => void {
-    return nameSelection(name, Selection.select);
-}
-
-export function saveSelections(id: string, selections: List<NameSelection>): (dispatch: Dispatch<NameActionTypes>) => Promise<void> {
+// TODO: Use saveMomements in api instead
+export function savemovements(id: string, movements: List<NameMovement>): (dispatch: Dispatch<NameActionTypes>) => Promise<void> {
     return async(dispatch: Dispatch<NameActionTypes>) => {
         dispatch({type: LOADING});
-        const select = selections
-            .filter(({ selection }) => selection === Selection.select)
-            .map(({ name }) => name)
-            .toJS();
-        const reject = selections
-            .filter(({ selection }) => selection === Selection.reject)
-            .map(({ name }) => name)
-            .toJS();
-        const payload = await selectNames(id, select, reject);
+        const payload = await saveMovements(id, movements.toJS())
         // TODO: Re-use with getNames above
-        dispatch({
-            type: GET_NAMES_DONE,
-            payload: {
-                remaining: fromJS(payload.Remaining),
-                rejected: fromJS(payload.Rejected || []),
-                selected: fromJS(payload.Selected || []),
-                selections: List(),
-           }
-        });
+        dispatch(receiveNames(payload));
     }
+}
+
+function receiveNames(payload: NamesResponse | ErrorResponse): NameActionTypes {
+    if ((payload as ErrorResponse).error) {
+        const { error } = (payload as ErrorResponse);
+        return {
+            type: ERROR,
+            payload: { error }
+        }
+    }
+    const { Remaining, Rejected, Selected } = (payload as NamesResponse);
+    return {
+        type: GET_NAMES_DONE,
+        payload: {
+            remaining: fromJS(Remaining),
+            rejected: fromJS(Rejected || []),
+            selected: fromJS(Selected || []),
+            movements: List(),
+       }
+    };
+}
+
+function receiveError({ error }: ErrorResponse): NameActionTypes {
+    return {
+        type: ERROR,
+        payload: { error }
+    };
 }

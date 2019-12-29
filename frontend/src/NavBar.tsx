@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import { Dispatch, Action, bindActionCreators } from 'redux';
-import { saveSelections } from './store/names/actions';
+import { savemovements } from './store/names/actions';
 import { useTranslation } from 'react-i18next';
 import { RouteComponentProps, withRouter } from "react-router-dom";
 import AppBar from 'material-ui/AppBar';
@@ -18,7 +18,7 @@ import SaveIcon from '@material-ui/icons/Save';
 import { UUID_REGEX } from './constants';
 import Chip from '@material-ui/core/Chip';
 import { List } from 'immutable';
-import { NameSelection } from './store/names/types';
+import { NameMovement } from './store/names/types';
 import './NavBar.css'
 
 const useStyles = makeStyles(theme => ({
@@ -27,27 +27,27 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-function mapStateToProps({ names: { selections, stateId, progress }}: IStoreState) {
-  return { selections, stateId, progress };
+function mapStateToProps({ names: { movements, stateId, progress }}: IStoreState) {
+  return { movements, stateId, progress };
 }
 
 
 function mapDispatchToProps(dispatch: Dispatch<Action>) {
   return {
-    save: bindActionCreators(saveSelections, dispatch),
+    save: bindActionCreators(savemovements, dispatch),
   };
 }
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
 
 interface Props extends RouteComponentProps<any> {
-  selections: List<NameSelection>
+  movements: List<NameMovement>
   save: Function
   stateId?: string
   progress: number
 }
 
-const NavBar: React.FC<Props> = ({ location, selections, save, stateId, progress }: Props) => {
+const NavBar: React.FC<Props> = ({ location, movements, save, stateId, progress }: Props) => {
   const match = location.pathname.match(`/(?<id>${UUID_REGEX})`)
   const state = match?.groups?.id || stateId;
   const { i18n, t } = useTranslation();
@@ -65,14 +65,14 @@ const NavBar: React.FC<Props> = ({ location, selections, save, stateId, progress
         <LeftDrawer open={menuOpen} closeMenu={closeMenu} stateId={state}/>
         <span className="navigation-toolbar">
           {state ? <Chip label={`${Math.floor(progress * 100)}%`} /> : null}
-          {selections.size && state ?
+          {movements.size && state ?
             <Button
               variant="contained"
               color="primary"
               size="small"
               className={classes.button}
               startIcon={<SaveIcon />}
-              onClick={() => save(match!.groups!.id, selections)}
+              onClick={() => save(match!.groups!.id, movements)}
             >
               {t('Save')}
             </Button> : null }

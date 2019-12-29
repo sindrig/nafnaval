@@ -11,18 +11,18 @@ import { Dispatch, Action, bindActionCreators } from 'redux';
 import { List } from 'immutable';
 import { IStoreState } from './store/reducer';
 import { getNames as getNamesAction } from './store/names/actions';
-import { NameSelection } from './store/names/types';
+import { NameMovement } from './store/names/types';
 import SelectionView from './SelectionView';
 import ShowSelection, { SelectionType } from './ShowSelection';
 
 
 interface SelectionProps extends RouteComponentProps<any>{
-  selections: List<NameSelection>
+  movements: List<NameMovement>
   getNames: (id: string) => (dispatch: Dispatch<Action>) => Promise<void>
 }
 
-function mapStateToProps({ names: { selections }}: IStoreState) {
-  return { selections };
+function mapStateToProps({ names: { movements }}: IStoreState) {
+  return { movements };
 }
 
 function mapDispatchToProps(dispatch: Dispatch<Action>) {
@@ -33,21 +33,21 @@ function mapDispatchToProps(dispatch: Dispatch<Action>) {
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
 
-const Selection: React.FC<SelectionProps> = ({getNames, selections, match}: SelectionProps) => {
+const Selection: React.FC<SelectionProps> = ({getNames, movements, match}: SelectionProps) => {
   const { t } = useTranslation();
   const { id } = useParams();
   useEffect(() => {getNames(id!)}, [getNames, id]);
   useEffect(() => {
-    if (selections.size > 0) {
+    if (movements.size > 0) {
       window.onbeforeunload = () => true;
     } else {
       window.onbeforeunload = null;
-    }}, [selections.size]
+    }}, [movements.size]
   );
   return (
     <React.Fragment>
       <Prompt
-        when={selections.size > 0}
+        when={movements.size > 0}
         message={t('Unsaved?')}
       />
 
