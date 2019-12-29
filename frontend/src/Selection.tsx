@@ -39,11 +39,11 @@ const Selection: React.FC<SelectionProps> = ({getNames, selections, match}: Sele
   useEffect(() => {getNames(id!)}, [getNames, id]);
   useEffect(() => {
     if (selections.size > 0) {
-      window.onbeforeunload = () => true
+      window.onbeforeunload = () => true;
     } else {
-      window.onbeforeunload = null
+      window.onbeforeunload = null;
     }}, [selections.size]
-  )
+  );
   return (
     <React.Fragment>
       <Prompt
