@@ -48,14 +48,14 @@ def test_get_state(dynamodb):
         'StateId': guid1,
         'Counterpart': guid2,
         'Remaining': {'Blank'},
-        'Selected': {'Sindri'},
+        'Selected': {'Sindri', 'SelectedBy1'},
         'Rejected': {'Oged'},
     }
     handler.name_table.put_item(Item=item)
     item = {
         'StateId': guid2,
         'Counterpart': guid1,
-        'Remaining': {'Blank2'},
+        'Remaining': {'Blank2', 'SelectedBy1'},
         'Selected': {'Sindri'},
         'Rejected': {'Oged'},
     }
@@ -65,4 +65,7 @@ def test_get_state(dynamodb):
 
     assert response['statusCode'] == 200
     body = json.loads(response['body'])
-    assert body == {'names': ['Sindri']}
+    assert body == {
+        'names': ['Sindri'],
+        'progress': {'self': 0.75, 'counterpart': 0.5},
+    }

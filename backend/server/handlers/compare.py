@@ -9,4 +9,20 @@ class CompareHandler(BaseHandler):
         state2 = self.get_state(state1['Counterpart'])
         common = state1['Selected'].intersection(state2['Selected'])
 
-        return response({'names': list(common - self.BLANK_SET)})
+        return response(
+            {
+                'names': list(common - self.BLANK_SET),
+                'progress': {
+                    'self': self._get_progress(state1),
+                    'counterpart': self._get_progress(state2),
+                },
+            }
+        )
+
+    def _get_progress(self, state):
+        total = (
+            len(state['Selected'])
+            + len(state['Rejected'])
+            + len(state['Remaining'])
+        )
+        return (total - len(state['Remaining'])) / total
