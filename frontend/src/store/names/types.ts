@@ -37,41 +37,43 @@ interface ErrorType {
 
 
 
-export const GET_NAMES = 'GET_NAMES';
-export const ERROR = 'ERROR';
-export const LOADING = 'LOADING';
-export const GET_NAMES_DONE = 'GET_NAMES_DONE';
-export const SIGNUP_DONE = 'SIGNUP_DONE';
-export const NAME_SELECTED = 'NAME_SELECTED';
+export enum ActionTypes {
+    GET_NAMES = 'GET_NAMES',
+    ERROR = 'ERROR',
+    LOADING = 'LOADING',
+    GET_NAMES_DONE = 'GET_NAMES_DONE',
+    SIGNUP_DONE = 'SIGNUP_DONE',
+    NAME_SELECTED = 'NAME_SELECTED',
+}
 
 interface GetNamesAction {
-    type: typeof GET_NAMES
+    type: typeof ActionTypes.GET_NAMES
     meta: {
         id: string
     }
 }
 
 interface GetNamesStarted {
-    type: typeof LOADING
+    type: typeof ActionTypes.LOADING
 }
 
 interface Error {
-    type: typeof ERROR
+    type: typeof ActionTypes.ERROR
     payload: ErrorType
 }
 
 interface GetNamesDone {
-    type: typeof GET_NAMES_DONE
+    type: typeof ActionTypes.GET_NAMES_DONE
     payload: Names
 }
 
 interface SignupDone {
-    type: typeof SIGNUP_DONE
+    type: typeof ActionTypes.SIGNUP_DONE
     payload: StateId
 }
 
 interface NameSelected {
-    type: typeof NAME_SELECTED,
+    type: typeof ActionTypes.NAME_SELECTED,
     payload: NameMovement
 }
 

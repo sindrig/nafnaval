@@ -1,12 +1,4 @@
-import {
-    NameState,
-    LOADING,
-    GET_NAMES_DONE,
-    NAME_SELECTED,
-    ERROR,
-    SIGNUP_DONE,
-    NameActionTypes,
-} from './types';
+import { NameState, ActionTypes, NameActionTypes } from './types';
 import { List } from 'immutable';
 
 
@@ -35,12 +27,12 @@ export default function nameReducer(
   action: NameActionTypes
 ): NameState {
   switch (action.type) {
-    case LOADING:
+    case ActionTypes.LOADING:
         return {
             ...state,
             initializing: true,
         }
-    case GET_NAMES_DONE:
+    case ActionTypes.GET_NAMES_DONE:
         const newStateGetNames = {
             ...state,
             initializing: false,
@@ -51,7 +43,7 @@ export default function nameReducer(
         }
         newStateGetNames.progress = getProgress(newStateGetNames);
         return newStateGetNames;
-    case NAME_SELECTED:
+    case ActionTypes.NAME_SELECTED:
       const newStateNameSelected = {
         ...state,
         remaining: state.remaining.filter(name => name !== action.payload.name),
@@ -59,12 +51,12 @@ export default function nameReducer(
       }
       newStateNameSelected.progress = getProgress(newStateNameSelected);
       return newStateNameSelected;
-    case SIGNUP_DONE:
+    case ActionTypes.SIGNUP_DONE:
       return {
         ...state,
         stateId: action.payload.stateId,
       }
-    case ERROR:
+    case ActionTypes.ERROR:
       return {
         ...state,
         initializing: false,

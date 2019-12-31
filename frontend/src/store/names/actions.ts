@@ -1,12 +1,12 @@
 import { Dispatch } from 'redux';
-import { LOADING, GET_NAMES_DONE, NAME_SELECTED, ERROR, SIGNUP_DONE, NameActionTypes, Bucket, NameMovement } from './types';
+import { ActionTypes, NameActionTypes, Bucket, NameMovement } from './types';
 import { getNameState, createState, saveMovements, NamesResponse, ErrorResponse, CreateStateResponse } from '../../api';
 import { fromJS, List } from 'immutable';
 
 
 export function getNames(id: string): (dispatch: Dispatch<NameActionTypes>) => Promise<void> {
     return async (dispatch: Dispatch<NameActionTypes>) => {
-        dispatch({type: LOADING});
+        dispatch({type: ActionTypes.LOADING});
 
         const payload = await getNameState(id);
         dispatch(receiveNames(payload));
@@ -15,7 +15,7 @@ export function getNames(id: string): (dispatch: Dispatch<NameActionTypes>) => P
 
 export function signUp(email1: string, email2: string, gender: string): (dispatch: Dispatch<NameActionTypes>) => Promise<void> {
     return async (dispatch: Dispatch<NameActionTypes>) => {
-        dispatch({type: LOADING});
+        dispatch({type: ActionTypes.LOADING});
 
         const payload = await createState(email1, email2, gender);
         if ((payload as ErrorResponse).error) {
@@ -23,7 +23,7 @@ export function signUp(email1: string, email2: string, gender: string): (dispatc
         } else {
             const {stateId} = (payload as CreateStateResponse);
             dispatch({
-                type: SIGNUP_DONE,
+                type: ActionTypes.SIGNUP_DONE,
                 payload: {stateId},
             })
         }
@@ -33,7 +33,7 @@ export function signUp(email1: string, email2: string, gender: string): (dispatc
 export function moveName(name: string, from: Bucket, to: Bucket): (dispatch: Dispatch<NameActionTypes>) => void {
     return (dispatch: Dispatch<NameActionTypes>) => {
         dispatch({
-            type: NAME_SELECTED,
+            type: ActionTypes.NAME_SELECTED,
             payload: { name, from, to }
         })
     };
@@ -42,7 +42,7 @@ export function moveName(name: string, from: Bucket, to: Bucket): (dispatch: Dis
 // TODO: Use saveMomements in api instead
 export function savemovements(id: string, movements: List<NameMovement>): (dispatch: Dispatch<NameActionTypes>) => Promise<void> {
     return async(dispatch: Dispatch<NameActionTypes>) => {
-        dispatch({type: LOADING});
+        dispatch({type: ActionTypes.LOADING});
         const payload = await saveMovements(id, movements.toJS())
         // TODO: Re-use with getNames above
         dispatch(receiveNames(payload));
@@ -53,13 +53,13 @@ function receiveNames(payload: NamesResponse | ErrorResponse): NameActionTypes {
     if ((payload as ErrorResponse).error) {
         const { error } = (payload as ErrorResponse);
         return {
-            type: ERROR,
+            type: ActionTypes.ERROR,
             payload: { error }
         }
     }
     const { Remaining, Rejected, Selected } = (payload as NamesResponse);
     return {
-        type: GET_NAMES_DONE,
+        type: ActionTypes.GET_NAMES_DONE,
         payload: {
             remaining: fromJS(Remaining),
             rejected: fromJS(Rejected || []),
@@ -71,7 +71,7 @@ function receiveNames(payload: NamesResponse | ErrorResponse): NameActionTypes {
 
 function receiveError({ error }: ErrorResponse): NameActionTypes {
     return {
-        type: ERROR,
+        type: ActionTypes.ERROR,
         payload: { error }
     };
 }
