@@ -12,6 +12,10 @@ export interface NameMovement {
     to: Bucket
 }
 
+interface UndoNamePayload {
+    name: string
+}
+
 interface StateId {
     stateId: string
 }
@@ -44,6 +48,7 @@ export enum ActionTypes {
     GET_NAMES_DONE = 'GET_NAMES_DONE',
     SIGNUP_DONE = 'SIGNUP_DONE',
     NAME_SELECTED = 'NAME_SELECTED',
+    UNDO_MOVEMENT = 'UNDO_MOVEMENT',
 }
 
 interface GetNamesAction {
@@ -73,10 +78,15 @@ interface SignupDone {
 }
 
 interface NameSelected {
-    type: typeof ActionTypes.NAME_SELECTED,
+    type: typeof ActionTypes.NAME_SELECTED
     payload: NameMovement
 }
 
+interface UndoMovements {
+    type: typeof ActionTypes.UNDO_MOVEMENT
+    payload: UndoNamePayload
+}
+
 export type NameActionTypes = (
-    GetNamesAction | GetNamesStarted | GetNamesDone | NameSelected | SignupDone | Error
+    GetNamesAction | GetNamesStarted | GetNamesDone | NameSelected | SignupDone | Error | UndoMovements
 )

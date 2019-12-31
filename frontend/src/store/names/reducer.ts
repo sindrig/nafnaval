@@ -1,18 +1,23 @@
 import { NameState, ActionTypes, NameActionTypes, Bucket, NameMovement } from './types';
 import { List } from 'immutable';
 
+enum StateBucketKeys {
+  remaining = 'remaining',
+  selected = 'selected',
+  rejected = 'rejected'
+}
 
 const initialState: NameState = {
-  remaining: List<string>(),
-  selected: List<string>(),
-  rejected: List<string>(),
+  [StateBucketKeys.remaining]: List<string>(),
+  [StateBucketKeys.selected]: List<string>(),
+  [StateBucketKeys.rejected]: List<string>(),
   movements: List<NameMovement>(),
   progress: 0,
   initializing: false,
   error: null,
 }
 
-const getProgress = (state: NameState) => {
+const getProgress = (state: NameState) : number => {
     const totalNames = (
       state.remaining.size +
       state.selected.size +
@@ -20,6 +25,23 @@ const getProgress = (state: NameState) => {
       state.movements.size
     );
     return (totalNames - state.remaining.size) / totalNames;
+}
+
+const updateProgress = (state: NameState) : NameState => {
+  return {...state, progress: getProgress(state)}
+}
+
+const getStateKey = (bucket: Bucket): StateBucketKeys => {
+  if (bucket === Bucket.Rejected) {
+    return StateBucketKeys.rejected;
+  }
+  if (bucket === Bucket.Selected) {
+    return StateBucketKeys.selected;
+  }
+  if (bucket === Bucket.Remaining) {
+    return StateBucketKeys.remaining;
+  }
+  throw new Error(`Unknown bucket ${bucket}`)
 }
 
 export default function nameReducer(
@@ -45,25 +67,12 @@ export default function nameReducer(
         return newStateGetNames;
     case ActionTypes.NAME_SELECTED:
       const { payload: { name, from, to } } = action;
-      const newStateNameSelected = {
+      const selectedStateKey = getStateKey(from);
+      return updateProgress({
         ...state,
         movements: state.movements.push({ name, from, to }),
-      }
-      switch (from) {
-        case Bucket.Selected:
-          newStateNameSelected.selected = newStateNameSelected.selected.filter(n => n !== name);
-          break;
-        case Bucket.Rejected:
-          newStateNameSelected.rejected = newStateNameSelected.rejected.filter(n => n !== name);
-          break;
-        case Bucket.Remaining:
-          newStateNameSelected.remaining = newStateNameSelected.remaining.filter(n => n !== name);
-          break;
-        default:
-          throw new Error(`Unknown from bucket ${from}`)
-      }
-      newStateNameSelected.progress = getProgress(newStateNameSelected);
-      return newStateNameSelected;
+        [selectedStateKey]: state[selectedStateKey].filter(n => n !== name),
+      });
     case ActionTypes.SIGNUP_DONE:
       return {
         ...state,
@@ -75,6 +84,17 @@ export default function nameReducer(
         initializing: false,
         error: action.payload.error,
       }
+    case ActionTypes.UNDO_MOVEMENT:
+      const movement = state.movements.find(({ name }) => name === action.payload.name)
+      if ( !movement ) {
+        return state;
+      }
+      const undoStateKey = getStateKey(movement.from);
+      return updateProgress({
+        ...state,
+        movements: state.movements.filterNot(({ name }) => name === action.payload.name),
+        [undoStateKey]: state[undoStateKey].insert(0, movement.name),
+      })
     default:
       return state
   }

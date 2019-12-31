@@ -40,12 +40,21 @@ export function moveName(name: string, from: Bucket, to: Bucket): (dispatch: Dis
 }
 
 // TODO: Use saveMomements in api instead
-export function savemovements(id: string, movements: List<NameMovement>): (dispatch: Dispatch<NameActionTypes>) => Promise<void> {
+export function persistChanges(id: string, movements: List<NameMovement>): (dispatch: Dispatch<NameActionTypes>) => Promise<void> {
     return async(dispatch: Dispatch<NameActionTypes>) => {
         dispatch({type: ActionTypes.LOADING});
         const payload = await saveMovements(id, movements.toJS())
         // TODO: Re-use with getNames above
         dispatch(receiveNames(payload));
+    }
+}
+
+export function undoChanges(name: string): (dispatch: Dispatch<NameActionTypes>) => void {
+    return (dispatch: Dispatch<NameActionTypes>) => {
+        dispatch({
+            type: ActionTypes.UNDO_MOVEMENT,
+            payload: { name }
+        });
     }
 }
 
