@@ -20,6 +20,7 @@ const resources = {
       'About': 'About',
       'Unsaved?': 'You have unsaved changes, are you sure you want to leave?',
       'Remove from list': 'Remove from list',
+      'View common names': 'View common names',
     },
   },
   is: {
@@ -39,6 +40,7 @@ const resources = {
       'About': 'Um síðuna',
       'Unsaved?': 'Þú ert með óvistaðar breytingar, ertu viss um að þú viljir hætta?',
       'Remove from list': 'Taka úr lista',
+      'View common names': 'Sameiginlegur listi'
     },
   },
 };

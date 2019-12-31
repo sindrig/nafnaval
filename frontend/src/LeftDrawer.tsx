@@ -37,6 +37,13 @@ const LeftDrawer: React.FC<Props> = ({ closeMenu, open, stateId }: Props) => {
         </MenuItem>
       </Link>
      )
+    links.push(
+      <Link to={`/${stateId}/compare`} key="compareSelected">
+        <MenuItem onClick={closeMenu}>
+          {t('View common names')}
+        </MenuItem>
+      </Link>
+     )
   }
   links.push(
     <Link to={`/about`} key="about">
