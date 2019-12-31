@@ -1,12 +1,12 @@
-import { NameState, ActionTypes, NameActionTypes } from './types';
+import { NameState, ActionTypes, NameActionTypes, Bucket, NameMovement } from './types';
 import { List } from 'immutable';
 
 
 const initialState: NameState = {
-  remaining: List(),
-  selected: List(),
-  rejected: List(),
-  movements: List(),
+  remaining: List<string>(),
+  selected: List<string>(),
+  rejected: List<string>(),
+  movements: List<NameMovement>(),
   progress: 0,
   initializing: false,
   error: null,
@@ -44,10 +44,23 @@ export default function nameReducer(
         newStateGetNames.progress = getProgress(newStateGetNames);
         return newStateGetNames;
     case ActionTypes.NAME_SELECTED:
+      const { payload: { name, from, to } } = action;
       const newStateNameSelected = {
         ...state,
-        remaining: state.remaining.filter(name => name !== action.payload.name),
-        movements: state.movements.push(action.payload),
+        movements: state.movements.push({ name, from, to }),
+      }
+      switch (from) {
+        case Bucket.Selected:
+          newStateNameSelected.selected = newStateNameSelected.selected.filter(n => n !== name);
+          break;
+        case Bucket.Rejected:
+          newStateNameSelected.rejected = newStateNameSelected.rejected.filter(n => n !== name);
+          break;
+        case Bucket.Remaining:
+          newStateNameSelected.remaining = newStateNameSelected.remaining.filter(n => n !== name);
+          break;
+        default:
+          throw new Error(`Unknown from bucket ${from}`)
       }
       newStateNameSelected.progress = getProgress(newStateNameSelected);
       return newStateNameSelected;

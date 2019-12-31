@@ -19,6 +19,7 @@ const resources = {
       'View rejected': 'View rejected',
       'About': 'About',
       'Unsaved?': 'You have unsaved changes, are you sure you want to leave?',
+      'Remove from list': 'Remove from list',
     },
   },
   is: {
@@ -37,6 +38,7 @@ const resources = {
       'View rejected': 'Höfnuð nöfn',
       'About': 'Um síðuna',
       'Unsaved?': 'Þú ert með óvistaðar breytingar, ertu viss um að þú viljir hætta?',
+      'Remove from list': 'Taka úr lista',
     },
   },
 };

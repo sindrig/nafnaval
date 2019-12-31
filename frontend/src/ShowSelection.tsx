@@ -1,8 +1,11 @@
 import React from 'react';
+import { Dispatch, Action, bindActionCreators } from 'redux';
 import { connect, ConnectedProps } from 'react-redux';
 import { useTranslation } from 'react-i18next';
+import { moveName } from './store/names/actions';
 // @ts-ignore
 import { IStoreState } from './store/reducer';
+import { Bucket } from './store/names/types';
 import { List as ImmutableList, OrderedMap } from 'immutable';
 import { makeStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
@@ -33,7 +36,13 @@ function mapStateToProps({names: { selected, rejected }}: IStoreState) {
   return { selected, rejected };
 }
 
-const connector = connect(mapStateToProps);
+function mapDispatchToProps(dispatch: Dispatch<Action>) {
+  return {
+    moveName: bindActionCreators(moveName, dispatch),
+  };
+}
+
+const connector = connect(mapStateToProps, mapDispatchToProps);
 
 type PropsFromRedux = ConnectedProps<typeof connector>
 export enum SelectionType {
@@ -44,17 +53,19 @@ type Props = PropsFromRedux & {
   selected: ImmutableList<string>
   rejected: ImmutableList<string>
   selection: SelectionType
+  moveName: Function
 }
 
 const localeComparer = (a: string, b: string) => {
     return a.localeCompare(b)
 };
 
-const ShowSelection: React.FC<Props> = ({selected, rejected, selection}: Props) => {
+const ShowSelection: React.FC<Props> = ({selected, rejected, selection, moveName}: Props) => {
   const { t } = useTranslation();
   const classes = useStyles();
   const nameList = selection === SelectionType.selected ? selected : rejected;
-  const select = (name: string) => console.log(name);
+  const currentBucket = selection === SelectionType.selected ? Bucket.Selected : Bucket.Rejected;
+
   let nameMap = OrderedMap<string, ImmutableList<string>>();
   nameList.sort(localeComparer).forEach(name => {
     const key = name.substr(0, 1);
@@ -89,7 +100,15 @@ const ShowSelection: React.FC<Props> = ({selected, rejected, selection}: Props) 
                             anchorOrigin={{ horizontal: 'right', vertical: 'top' }}
                             targetOrigin={{ horizontal: 'right', vertical: 'top' }}
                           >
-                            <MenuItem primaryText={t('Select')} onClick={() => select(name)} />
+                            { currentBucket !== Bucket.Selected
+                              ? <MenuItem primaryText={t('Select')} onClick={() => moveName(name, currentBucket, Bucket.Selected)} />
+                              : null
+                            }
+                            { currentBucket !== Bucket.Rejected
+                              ? <MenuItem primaryText={t('Reject')} onClick={() => moveName(name, currentBucket, Bucket.Rejected)} />
+                              : null
+                            }
+                            <MenuItem primaryText={t('Remove from list')} onClick={() => moveName(name, currentBucket, Bucket.Remaining)} />
                           </IconMenu>
                         </ListItemSecondaryAction>
                       </ListItem>
