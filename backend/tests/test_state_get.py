@@ -28,6 +28,9 @@ def test_get_state(dynamodb):
         'Remaining': {'Sindri'},
         'Selected': {'Someone'},
         'Rejected': {'Oged'},
+        'Email': 'test@test.com',
+        'UnknownKey': 'Something',
+        'Counterpart': 'Counterpart',
     }
     handler.name_table.put_item(Item=item)
 

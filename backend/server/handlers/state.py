@@ -6,9 +6,9 @@ import uuid
 import re
 from urllib.parse import urljoin
 
-import boto3
 import botocore
 
+from server.handlers.base import BaseHandler
 from server.responses import response
 from server.exceptions import NotFound, BadInput
 from server import names
@@ -17,35 +17,13 @@ TEMPLATE_DIR = os.path.dirname(os.path.abspath(__file__))
 STUPID_EMAIL_REGEX = re.compile(r'[^@]+@[^@]+\.[^@]+')
 FRONTEND_URL = 'https://nafnaval.is'
 EMAIL_SENDER = 'nafnaval@nafnaval.is'
-BLANK = '__blank'
-_blank_set = {BLANK}
 
 
-class StateHandler:
-    def __init__(self):
-        dynamodb = boto3.resource(
-            'dynamodb', region_name=os.getenv('AWS_REGION')
-        )
-        self.name_table = dynamodb.Table(os.getenv('NAMES_TABLE'))
-        self.ses_client = boto3.client(
-            'ses', region_name=os.getenv('AWS_REGION')
-        )
-
+class StateHandler(BaseHandler):
     def get(self, request):
-        state_id = self._get_state_id(request)
-        attrs = [
-            'StateId',
-            'Email',
-            'Selected',
-            'Rejected',
-            'Remaining',
-        ]
-        result = self.name_table.get_item(
-            Key={'StateId': state_id}, ProjectionExpression=','.join(attrs)
-        )
-        if 'Item' not in result:
-            raise NotFound(f'State "{state_id}" not found')
-        return response(self._serializable(result['Item']))
+        state_id = self.get_state_id(request)
+        state = self.get_state(state_id)
+        return response(self._serializable(state))
 
     def put(self, request):
         email1 = self._get_and_validate_email(request.body, 'email1')
@@ -78,7 +56,7 @@ class StateHandler:
         return response({'stateId': state_id})
 
     def post(self, request):
-        state_id = self._get_state_id(request)
+        state_id = self.get_state_id(request)
         # TODO: Do not default action
         # TODO: Migrate save to movements?
         if request.body.get('action', 'save') == 'save':
@@ -163,9 +141,9 @@ class StateHandler:
             'StateId': state_id,
             'Counterpart': counterpart,
             'Email': email,
-            'Remaining': names.union(_blank_set),
-            'Rejected': _blank_set,
-            'Selected': _blank_set,
+            'Remaining': names.union(self.BLANK_SET),
+            'Rejected': self.BLANK_SET,
+            'Selected': self.BLANK_SET,
             'Created': int(time.time()),
             'Updated': int(time.time()),
         }
@@ -177,9 +155,6 @@ class StateHandler:
         if not STUPID_EMAIL_REGEX.match(email):
             raise BadInput(f'Invalid email "{email}"')
         return email
-
-    def _get_state_id(self, request):
-        return request.path.split('/')[0]
 
     def _send_email(self, email, state_id, template):
         response = self.ses_client.send_email(
@@ -200,8 +175,11 @@ class StateHandler:
     def _serializable(self, item):
         result = {}
         for k, v in item.items():
+            if k in ('Counterpart', 'Email'):
+                # Skip counterparts
+                continue
             if isinstance(v, set):
-                result[k] = list(v - _blank_set)
+                result[k] = list(v - self.BLANK_SET)
                 if k == 'Remaining':
                     # We want to have Remaining shuffled always
                     random.shuffle(result[k])

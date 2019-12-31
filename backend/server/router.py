@@ -3,12 +3,12 @@ from urllib.parse import urlparse
 from server.responses import response
 from server.exceptions import NotFound, BadInput, HttpError, MethodNotAllowed
 
-from server.handlers import StateHandler
+from server.handlers import StateHandler, CompareHandler
 from server.request import Request
 
 
 def get_handler(key):
-    return {'state': StateHandler}.get(key, None)
+    return {'state': StateHandler, 'compare': CompareHandler}.get(key, None)
 
 
 def serve(path, method, body=None):
