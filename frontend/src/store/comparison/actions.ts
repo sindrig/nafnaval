@@ -1,5 +1,5 @@
 import { Dispatch } from 'redux';
-import { ActionTypes, ComparsionActionTypes, CompareState } from './types';
+import { ActionTypes, ComparsionActionTypes } from './types';
 import { getComparison, ComparisonResponse, ErrorResponse } from '../../api';
 import { fromJS } from 'immutable';
 

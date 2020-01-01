@@ -6,6 +6,13 @@ import { getComparisonList } from '../store/comparison/actions';
 import { List } from 'immutable';
 import { IStoreState } from '../store/reducer';
 import { Progress } from '../store/comparison/types';
+import { makeStyles } from '@material-ui/core/styles';
+import Card from '@material-ui/core/Card';
+import CardActions from '@material-ui/core/CardActions';
+import CardContent from '@material-ui/core/CardContent';
+import Button from '@material-ui/core/Button';
+import Typography from '@material-ui/core/Typography';
+import Container from '@material-ui/core/Container';
 import ShowSelection, { Action } from './ShowSelection';
 
 
@@ -27,19 +34,48 @@ type Props = PropsFromRedux & {
   id?: string
 }
 
+const useStyles = makeStyles({
+  card: {
+    minWidth: 275,
+  },
+  title: {
+    fontSize: 14,
+  },
+  pos: {
+    marginBottom: 12,
+  },
+  progress: {
+    display: 'inline-block',
+    float: 'left',
+    width: '50%',
+  }
+});
+
 const ComparisonList: React.FC<Props> = ({ names, progress, getComparisonList, id }: Props) => {
   const { t } = useTranslation();
-  console.log('id', id);
   useEffect(() => {
     if (id) {
       getComparisonList(id)
     }
   }, [getComparisonList, id]);
+  const classes = useStyles();
   if ( !id ) {
     return null;
   }
   return (
-    <ShowSelection names={names} />
+    <div>
+      <Card className={classes.card}>
+        <CardContent>
+          <Typography variant="h5" component="h2" className={classes.progress}>
+            {t('Your progress')}: {Math.floor(progress.self * 100)}%
+          </Typography>
+          <Typography variant="h5" component="h2" align="right" className={classes.progress}>
+            {t('Partner progress')}: {Math.floor(progress.counterpart * 100)}%
+          </Typography>
+        </CardContent>
+      </Card>
+      <ShowSelection names={names} />
+    </div>
    )
 }
 

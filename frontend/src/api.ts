@@ -76,7 +76,7 @@ export const getNameState = async (id: string): Promise<NamesResponse | ErrorRes
 export const getComparison = async (id: string): Promise<ComparisonResponse | ErrorResponse> => {
   if ( MOCK_API ) {
     return new Promise((resolve) => {
-      resolve({"names": ["Sindri", "Vi\u00f0ar", "Ernir"], "progress": {"self": 0.3376818866031109, "counterpart": 0.45760160561966884}});
+      resolve({"names": ["Sindri", "Vi\u00f0ar", "Ernir", "Bjarnlaugur", "J\u00f6rri", "Arnleifur", "Vigri", "Galdur", "Erasmus", "V\u00e9kell", "Ingvaldur", "Oddur", "Gill", "Hallmann", "\u00de\u00f3rhalli", "D\u00f3maldi", "Hervin", "Mensalder", "Barri", "Alfons", "Sigurbjarni"], "progress": {"self": 0.3376818866031109, "counterpart": 0.45760160561966884}});
     })
   }
   try {
