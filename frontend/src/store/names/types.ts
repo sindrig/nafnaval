@@ -44,7 +44,7 @@ interface ErrorType {
 export enum ActionTypes {
     GET_NAMES = 'GET_NAMES',
     ERROR = 'ERROR',
-    LOADING = 'LOADING',
+    LOADING_NAMES = 'LOADING_NAMES',
     GET_NAMES_DONE = 'GET_NAMES_DONE',
     SIGNUP_DONE = 'SIGNUP_DONE',
     NAME_SELECTED = 'NAME_SELECTED',
@@ -59,7 +59,7 @@ interface GetNamesAction {
 }
 
 interface GetNamesStarted {
-    type: typeof ActionTypes.LOADING
+    type: typeof ActionTypes.LOADING_NAMES
 }
 
 interface Error {

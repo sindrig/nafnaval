@@ -33,14 +33,14 @@ export interface Action {
 
 interface Props {
   names: ImmutableList<string>
-  actions: Action[]
+  actions?: Action[]
 }
 
 const localeComparer = (a: string, b: string) => {
     return a.localeCompare(b)
 };
 
-const ShowSelection: React.FC<Props> = ({ names, actions }: Props) => {
+const ShowSelection: React.FC<Props> = ({ names, actions = [] }: Props) => {
   const classes = useStyles();
 
   let nameMap = OrderedMap<string, ImmutableList<string>>();
@@ -71,17 +71,18 @@ const ShowSelection: React.FC<Props> = ({ names, actions }: Props) => {
                         <ListItemText
                           primary={name}
                         />
-                        <ListItemSecondaryAction>
-                          <IconMenu
-                            iconButtonElement={<IconButton><MoreVertIcon /></IconButton>}
-                            anchorOrigin={{ horizontal: 'right', vertical: 'top' }}
-                            targetOrigin={{ horizontal: 'right', vertical: 'top' }}
-                          >
-                            {actions.map(({label, action}) => 
-                              <MenuItem primaryText={label} onClick={() => action(name)} key={label}/>
-                            )}
-                          </IconMenu>
-                        </ListItemSecondaryAction>
+                        {actions.length > 0 ?
+                          <ListItemSecondaryAction>
+                            <IconMenu
+                              iconButtonElement={<IconButton><MoreVertIcon /></IconButton>}
+                              anchorOrigin={{ horizontal: 'right', vertical: 'top' }}
+                              targetOrigin={{ horizontal: 'right', vertical: 'top' }}
+                            >
+                              {actions.map(({label, action}) =>
+                                <MenuItem primaryText={label} onClick={() => action(name)} key={label}/>
+                              )}
+                            </IconMenu>
+                          </ListItemSecondaryAction> : null}
                       </ListItem>
                      );
                   })}

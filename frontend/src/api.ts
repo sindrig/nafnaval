@@ -31,6 +31,14 @@ export interface CreateStateResponse {
   stateId: string
 }
 
+export interface ComparisonResponse {
+  names: string[]
+  progress: {
+    self: number
+    counterpart: number
+  }
+}
+
 const MOCK_API = process.env.NODE_ENV === "development" && true;
 
 export const getNameState = async (id: string): Promise<NamesResponse | ErrorResponse> => {
@@ -43,6 +51,23 @@ export const getNameState = async (id: string): Promise<NamesResponse | ErrorRes
   }
   try {
     const response = await apiClient.get<NamesResponse>(`/state/${id}`);
+    return response.data;
+  } catch (err) {
+    if (err && err.response) {
+      return err.response.data;
+    }
+    throw err;
+  }
+}
+
+export const getComparison = async (id: string): Promise<ComparisonResponse | ErrorResponse> => {
+  if ( MOCK_API ) {
+    return new Promise((resolve) => {
+      resolve({"names": ["Sindri", "Vi\u00f0ar", "Ernir"], "progress": {"self": 0.3376818866031109, "counterpart": 0.45760160561966884}});
+    })
+  }
+  try {
+    const response = await apiClient.get<ComparisonResponse>(`/compare/${id}`);
     return response.data;
   } catch (err) {
     if (err && err.response) {

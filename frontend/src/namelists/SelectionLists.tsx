@@ -43,6 +43,7 @@ const SelectedComponent: React.FC<Props> = ({ selected, moveName }: Props) => {
    )
 }
 
+export const Selected = connector(SelectedComponent);
 
 const RejectedComponent: React.FC<Props> = ({ rejected, moveName }: Props) => {
   const { t } = useTranslation();
@@ -61,5 +62,4 @@ const RejectedComponent: React.FC<Props> = ({ rejected, moveName }: Props) => {
    )
 }
 
-export const Selected = connector(SelectedComponent);
 export const Rejected = connector(RejectedComponent);

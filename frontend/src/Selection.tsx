@@ -14,6 +14,7 @@ import { getNames as getNamesAction } from './store/names/actions';
 import { NameMovement } from './store/names/types';
 import SelectionView from './SelectionView';
 import { Selected, Rejected} from './namelists/SelectionLists';
+import ComparisonList from './namelists/ComparisonList';
 
 
 interface SelectionProps extends RouteComponentProps<any>{
@@ -54,6 +55,9 @@ const Selection: React.FC<SelectionProps> = ({getNames, movements, match}: Selec
       <Switch>
         <Route path={`${match.path}/selected`} component={Selected} />
         <Route path={`${match.path}/rejected`} component={Rejected} />
+        <Route path={`${match.path}/compare`}>
+          <ComparisonList id={id} />
+        </Route>
         <Route path={`${match.path}/`} component={SelectionView} />
       </Switch>
     </React.Fragment>

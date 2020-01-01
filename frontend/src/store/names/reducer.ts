@@ -49,7 +49,7 @@ export default function nameReducer(
   action: NameActionTypes
 ): NameState {
   switch (action.type) {
-    case ActionTypes.LOADING:
+    case ActionTypes.LOADING_NAMES:
         return {
             ...state,
             initializing: true,

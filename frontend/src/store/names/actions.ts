@@ -6,7 +6,7 @@ import { fromJS, List } from 'immutable';
 
 export function getNames(id: string): (dispatch: Dispatch<NameActionTypes>) => Promise<void> {
     return async (dispatch: Dispatch<NameActionTypes>) => {
-        dispatch({type: ActionTypes.LOADING});
+        dispatch({type: ActionTypes.LOADING_NAMES});
 
         const payload = await getNameState(id);
         dispatch(receiveNames(payload));
@@ -15,7 +15,7 @@ export function getNames(id: string): (dispatch: Dispatch<NameActionTypes>) => P
 
 export function signUp(email1: string, email2: string, gender: string): (dispatch: Dispatch<NameActionTypes>) => Promise<void> {
     return async (dispatch: Dispatch<NameActionTypes>) => {
-        dispatch({type: ActionTypes.LOADING});
+        dispatch({type: ActionTypes.LOADING_NAMES});
 
         const payload = await createState(email1, email2, gender);
         if ((payload as ErrorResponse).error) {
@@ -42,7 +42,7 @@ export function moveName(name: string, from: Bucket, to: Bucket): (dispatch: Dis
 // TODO: Use saveMomements in api instead
 export function persistChanges(id: string, movements: List<NameMovement>): (dispatch: Dispatch<NameActionTypes>) => Promise<void> {
     return async(dispatch: Dispatch<NameActionTypes>) => {
-        dispatch({type: ActionTypes.LOADING});
+        dispatch({type: ActionTypes.LOADING_NAMES});
         const payload = await saveMovements(id, movements.toJS())
         // TODO: Re-use with getNames above
         dispatch(receiveNames(payload));
