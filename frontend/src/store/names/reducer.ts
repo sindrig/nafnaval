@@ -64,6 +64,11 @@ export default function nameReducer(
             ...action.payload
         }
         newStateGetNames.progress = getProgress(newStateGetNames);
+        const firstNameInCurrentState = state.remaining.get(0);
+        if (firstNameInCurrentState && action.payload.remaining.contains(firstNameInCurrentState)) {
+          const index = action.payload.remaining.indexOf(firstNameInCurrentState)
+          newStateGetNames.remaining = newStateGetNames.remaining.delete(index).insert(0, firstNameInCurrentState)
+        }
         return newStateGetNames;
     case ActionTypes.NAME_SELECTED:
       const { payload: { name, from, to } } = action;
