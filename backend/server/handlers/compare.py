@@ -20,9 +20,10 @@ class CompareHandler(BaseHandler):
         )
 
     def _get_progress(self, state):
+        remaining = state['Remaining'] - self.BLANK_SET
         total = (
-            len(state['Selected'])
-            + len(state['Rejected'])
-            + len(state['Remaining'])
+            len(state['Selected'] - self.BLANK_SET)
+            + len(state['Rejected'] - self.BLANK_SET)
+            + len(remaining)
         )
-        return (total - len(state['Remaining'])) / total
+        return (total - len(remaining)) / total
