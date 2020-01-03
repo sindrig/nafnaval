@@ -58,7 +58,9 @@ const Selection: React.FC<SelectionProps> = ({getNames, movements, match}: Selec
         <Route path={`${match.path}/compare`}>
           <ComparisonList id={id} />
         </Route>
-        <Route path={`${match.path}/`} component={SelectionView} />
+        <Route path={`${match.path}/`}>
+          <SelectionView id={id} />
+        </Route>
       </Switch>
     </React.Fragment>
   )

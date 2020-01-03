@@ -26,14 +26,15 @@ type Props = PropsFromRedux & {
   select: Function
   reject: Function
   name?: string
+  id?: string
   progress: number
 }
 
-const SelectionView: React.FC<Props> = ({ name, reject, select, progress }: Props) => {
+const SelectionView: React.FC<Props> = ({ name, reject, select, progress, id }: Props) => {
   const { t } = useTranslation();
   if (!name) {
-    if (progress) {
-      return <Redirect to="/done" />
+    if (progress && id) {
+      return <Redirect to={`${id}/compare`} />
     }
     return <div>{t('Loading...')}</div>
   }
