@@ -46,6 +46,13 @@ const LeftDrawer: React.FC<Props> = ({ closeMenu, open, stateId }: Props) => {
      )
   }
   links.push(
+    <Link to={`/`} key="signup">
+      <MenuItem onClick={closeMenu}>
+        {t('Sign up')}
+      </MenuItem>
+    </Link>
+  );
+  links.push(
     <Link to={`/about`} key="about">
       <MenuItem onClick={closeMenu}>
         {t('About')}
