@@ -19,6 +19,10 @@ name, so obviously I recreated nafn.is.
 ## Who?
 
 Written and hosted by [Sindri Guðmundsson](https://irdn.is).
+
+## Problems?
+
+Contact me (links to social feeds on my page)!
 `
 export default () => (
   <div className="about">
