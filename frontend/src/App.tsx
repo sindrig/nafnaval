@@ -11,6 +11,7 @@ import LoadingOverlay from 'react-loading-overlay';
 import { IStoreState } from './store/reducer';
 import { UUID_REGEX } from './constants';
 import Selection from './Selection';
+import About from './About';
 import Signup from './Signup';
 import NavBar from './NavBar';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -47,7 +48,7 @@ const App: React.FC<Props> = ({ initializing, error }: Props) => {
                 <Selection />
               </Route>
               <Route path="/about">
-                <div>TODO ABOUT</div>
+                <About />
               </Route>
               <Route path="/">
                 <Signup />
