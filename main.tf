@@ -8,7 +8,6 @@ provider "aws" {
 }
 
 variable "app_version" {
-  default = "tobechanged"
 }
 
 variable "www_domain_name" {
