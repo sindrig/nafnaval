@@ -3,12 +3,12 @@ provider "aws" {
 }
 
 provider "aws" {
-  # us-east-1 instance
   region = "us-east-1"
-  alias = "use1"
+  alias  = "us"
 }
 
 variable "app_version" {
+  default = "tobechanged"
 }
 
 variable "www_domain_name" {
@@ -20,7 +20,17 @@ variable "root_domain_name" {
 }
 
 resource "aws_s3_bucket" "lambdaholder" {
-  acl    = "private"
+  acl = "private"
+}
+
+
+terraform {
+  backend "s3" {
+    encrypt = true
+    bucket  = "nafnaval-is-terraform-state"
+    region  = "eu-west-1"
+    key     = "main/terraform.tfstate"
+  }
 }
 
 resource "aws_lambda_function" "namelambda" {
@@ -35,7 +45,7 @@ resource "aws_lambda_function" "namelambda" {
   # exported in that file.
   handler = "main.handler"
   runtime = "python3.8"
-  role = aws_iam_role.lambda_exec.arn
+  role    = aws_iam_role.lambda_exec.arn
 
   environment {
     variables = {
@@ -43,11 +53,11 @@ resource "aws_lambda_function" "namelambda" {
     }
   }
 
-  depends_on    = [aws_iam_role_policy_attachment.lambda_logs, aws_cloudwatch_log_group.example]
+  depends_on = [aws_iam_role_policy_attachment.lambda_logs, aws_cloudwatch_log_group.example]
 }
 
 resource "aws_iam_role" "lambda_exec" {
-  name = "lambda-execution-role"
+  name               = "lambda-execution-role"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -71,8 +81,8 @@ resource "aws_cloudwatch_log_group" "example" {
 }
 
 resource "aws_iam_policy" "lambda_logging" {
-  name = "lambda_logging"
-  path = "/"
+  name        = "lambda_logging"
+  path        = "/"
   description = "IAM policy for logging from a lambda"
 
   policy = <<EOF
@@ -94,8 +104,8 @@ EOF
 }
 
 resource "aws_iam_policy" "lambda_dynamo" {
-  name = "lambda_dynamo"
-  path = "/"
+  name        = "lambda_dynamo"
+  path        = "/"
   description = "IAM policy for dynamodb from a lambda"
 
   policy = <<EOF
@@ -115,8 +125,8 @@ EOF
 }
 
 resource "aws_iam_policy" "lambda_ses" {
-  name = "lambda_ses"
-  path = "/"
+  name        = "lambda_ses"
+  path        = "/"
   description = "IAM policy for SES from a lambda"
 
   policy = <<EOF
@@ -136,17 +146,17 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_logs" {
-  role = aws_iam_role.lambda_exec.name
+  role       = aws_iam_role.lambda_exec.name
   policy_arn = aws_iam_policy.lambda_logging.arn
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_dynamo" {
-  role = aws_iam_role.lambda_exec.name
+  role       = aws_iam_role.lambda_exec.name
   policy_arn = aws_iam_policy.lambda_dynamo.arn
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_ses" {
-  role = aws_iam_role.lambda_exec.name
+  role       = aws_iam_role.lambda_exec.name
   policy_arn = aws_iam_policy.lambda_ses.arn
 }
 
@@ -156,98 +166,98 @@ resource "aws_api_gateway_rest_api" "gateway" {
 }
 
 resource "aws_api_gateway_resource" "proxy" {
-   rest_api_id = aws_api_gateway_rest_api.gateway.id
-   parent_id   = aws_api_gateway_rest_api.gateway.root_resource_id
-   path_part   = "{proxy+}"
+  rest_api_id = aws_api_gateway_rest_api.gateway.id
+  parent_id   = aws_api_gateway_rest_api.gateway.root_resource_id
+  path_part   = "{proxy+}"
 }
 
 resource "aws_api_gateway_method" "proxy" {
-   rest_api_id   = aws_api_gateway_rest_api.gateway.id
-   resource_id   = aws_api_gateway_resource.proxy.id
-   http_method   = "ANY"
-   authorization = "NONE"
+  rest_api_id   = aws_api_gateway_rest_api.gateway.id
+  resource_id   = aws_api_gateway_resource.proxy.id
+  http_method   = "ANY"
+  authorization = "NONE"
 }
 
 resource "aws_api_gateway_method_response" "cors_method_response_200" {
-    rest_api_id   = aws_api_gateway_rest_api.gateway.id
-    resource_id   = aws_api_gateway_resource.proxy.id
-    http_method   = aws_api_gateway_method.proxy.http_method
-    status_code   = 200
-    #response_parameters = {
-        #"method.response.header.Access-Control-Allow-Origin" = true
-    #}
-    response_models = {
-      "application/json" = "Empty"
-    }
+  rest_api_id = aws_api_gateway_rest_api.gateway.id
+  resource_id = aws_api_gateway_resource.proxy.id
+  http_method = aws_api_gateway_method.proxy.http_method
+  status_code = 200
+  #response_parameters = {
+  #"method.response.header.Access-Control-Allow-Origin" = true
+  #}
+  response_models = {
+    "application/json" = "Empty"
+  }
 
-    response_parameters = {
-      "method.response.header.Access-Control-Allow-Headers" = true
-      "method.response.header.Access-Control-Allow-Methods" = true
-      "method.response.header.Access-Control-Allow-Origin" = true
-    }
-    depends_on = [aws_api_gateway_method.proxy]
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = true
+    "method.response.header.Access-Control-Allow-Methods" = true
+    "method.response.header.Access-Control-Allow-Origin"  = true
+  }
+  depends_on = [aws_api_gateway_method.proxy]
 }
 
 resource "aws_api_gateway_integration" "lambda" {
-   rest_api_id = aws_api_gateway_rest_api.gateway.id
-   resource_id = aws_api_gateway_method.proxy.resource_id
-   http_method = aws_api_gateway_method.proxy.http_method
+  rest_api_id = aws_api_gateway_rest_api.gateway.id
+  resource_id = aws_api_gateway_method.proxy.resource_id
+  http_method = aws_api_gateway_method.proxy.http_method
 
-   integration_http_method = "POST"
-   type                    = "AWS_PROXY"
-   uri                     = aws_lambda_function.namelambda.invoke_arn
- }
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = aws_lambda_function.namelambda.invoke_arn
+}
 
 resource "aws_api_gateway_method" "proxy_root" {
-   rest_api_id   = aws_api_gateway_rest_api.gateway.id
-   resource_id   = aws_api_gateway_rest_api.gateway.root_resource_id
-   http_method   = "ANY"
-   authorization = "NONE"
- }
+  rest_api_id   = aws_api_gateway_rest_api.gateway.id
+  resource_id   = aws_api_gateway_rest_api.gateway.root_resource_id
+  http_method   = "ANY"
+  authorization = "NONE"
+}
 
 resource "aws_api_gateway_integration" "lambda_root" {
-   rest_api_id = aws_api_gateway_rest_api.gateway.id
-   resource_id = aws_api_gateway_method.proxy_root.resource_id
-   http_method = aws_api_gateway_method.proxy_root.http_method
+  rest_api_id = aws_api_gateway_rest_api.gateway.id
+  resource_id = aws_api_gateway_method.proxy_root.resource_id
+  http_method = aws_api_gateway_method.proxy_root.http_method
 
-   integration_http_method = "POST"
-   type                    = "AWS_PROXY"
-   uri                     = aws_lambda_function.namelambda.invoke_arn
- }
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = aws_lambda_function.namelambda.invoke_arn
+}
 
 resource "aws_api_gateway_deployment" "deployment" {
-   depends_on = [
-     aws_api_gateway_integration.lambda,
-     aws_api_gateway_integration.lambda_root,
-   ]
+  depends_on = [
+    aws_api_gateway_integration.lambda,
+    aws_api_gateway_integration.lambda_root,
+  ]
 
-   rest_api_id = aws_api_gateway_rest_api.gateway.id
-   stage_name  = "stage"
- }
+  rest_api_id = aws_api_gateway_rest_api.gateway.id
+  stage_name  = "stage"
+}
 
 module "gateway_cors" {
   source  = "bridgecrewio/apigateway-cors/aws"
   version = "1.1.0"
 
-  api = aws_api_gateway_rest_api.gateway.id
+  api       = aws_api_gateway_rest_api.gateway.id
   resources = [aws_api_gateway_resource.proxy.id]
 
   methods = ["GET", "POST", "PUT"]
 }
 
 resource "aws_lambda_permission" "apigw" {
-   statement_id  = "AllowAPIGatewayInvoke"
-   action        = "lambda:InvokeFunction"
-   function_name = aws_lambda_function.namelambda.function_name
-   principal     = "apigateway.amazonaws.com"
+  statement_id  = "AllowAPIGatewayInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.namelambda.function_name
+  principal     = "apigateway.amazonaws.com"
 
-   source_arn = "${aws_api_gateway_rest_api.gateway.execution_arn}/*/*/*"
- }
+  source_arn = "${aws_api_gateway_rest_api.gateway.execution_arn}/*/*/*"
+}
 
 resource "aws_dynamodb_table" "names" {
-  name = "nafnaval-names"
+  name         = "nafnaval-names"
   billing_mode = "PAY_PER_REQUEST"
-  hash_key = "StateId"
+  hash_key     = "StateId"
 
   attribute {
     name = "StateId"
@@ -280,7 +290,7 @@ POLICY
 }
 
 resource "aws_acm_certificate" "certificate" {
-  provider = aws.use1
+  provider          = aws.us
   domain_name       = "*.${var.root_domain_name}"
   validation_method = "DNS"
 
