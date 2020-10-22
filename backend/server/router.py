@@ -16,7 +16,7 @@ def serve(path, method, body=None):
         try:
             handler_key, rest = path.split('/', 1)
         except ValueError:
-            raise NotFound(f'Could not parse handler key and rest from {path}')
+            handler_key, rest = path, ''
         target_handler = get_handler(handler_key)
         if target_handler is None:
             raise NotFound(f'Could not find handler key "{handler_key}"')

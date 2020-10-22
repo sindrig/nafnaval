@@ -4,4 +4,10 @@ A free service for soon-to-be parents that need to select valid Icelandic names 
 
 ## Development
 
+Start your local backend:
 
+    make test-env
+
+Run the front-end:
+
+    yarn start
