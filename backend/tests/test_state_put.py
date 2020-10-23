@@ -10,7 +10,10 @@ from server.exceptions import BadInput
 
 def test_missing_email1():
     handler = StateHandler()
-    request = Request(path='', body={'email2': 'sindri@irdn.is'},)
+    request = Request(
+        path='',
+        body={'email2': 'sindri@irdn.is'},
+    )
 
     with pytest.raises(BadInput) as exc:
         handler.put(request)
@@ -20,7 +23,10 @@ def test_missing_email1():
 
 def test_missing_email2():
     handler = StateHandler()
-    request = Request(path='', body={'email1': 'sindri@nafnaval.is'},)
+    request = Request(
+        path='',
+        body={'email1': 'sindri@nafnaval.is'},
+    )
 
     with pytest.raises(BadInput) as exc:
         handler.put(request)

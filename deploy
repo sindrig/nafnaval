@@ -4,9 +4,15 @@ set -euxo pipefail
 
 TARGET=$1
 
+if [[ "$TARGET" == "staging" ]]; then
+    TERRAFORM_ARGS='-auto-approve'
+else
+    TERRAFORM_ARGS=''
+fi
+
 (
     cd infra/$TARGET
-    terraform apply
+    terraform apply $TERRAFORM_ARGS
 )
 
 FRONTEND_BUCKET=`cd infra/$TARGET && terraform output frontendbucket`

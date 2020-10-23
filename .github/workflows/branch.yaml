@@ -1,0 +1,24 @@
+name: Code checks
+
+on:
+  pull_request:
+  push:
+
+jobs:
+  lint:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Prettier frontend
+        run: |
+          cd frontend
+          yarn prettier . --check
+
+
+      - name: Black backend
+        run: |
+          cd backend
+          black . --check

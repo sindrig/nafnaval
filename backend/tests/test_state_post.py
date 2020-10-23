@@ -12,7 +12,8 @@ def test_post_nonexist_state(dynamodb):
     handler = StateHandler()
     state_id = 'test'
     request = Request(
-        path=f'{state_id}/', body={'select': ['Arnar'], 'reject': ['Bjarni']},
+        path=f'{state_id}/',
+        body={'select': ['Arnar'], 'reject': ['Bjarni']},
     )
 
     with pytest.raises(NotFound):
@@ -22,7 +23,10 @@ def test_post_nonexist_state(dynamodb):
 def test_post_empty_select_reject(dynamodb):
     handler = StateHandler()
     state_id = 'test'
-    request = Request(path=f'{state_id}/', body={'select': [], 'reject': []},)
+    request = Request(
+        path=f'{state_id}/',
+        body={'select': [], 'reject': []},
+    )
 
     with pytest.raises(BadInput):
         handler.post(request)
@@ -31,12 +35,16 @@ def test_post_empty_select_reject(dynamodb):
 def test_post_missing_movements(dynamodb):
     handler = StateHandler()
     state_id = 'test'
-    request = Request(path=f'{state_id}/', body={'action': 'move'},)
+    request = Request(
+        path=f'{state_id}/',
+        body={'action': 'move'},
+    )
 
     with pytest.raises(BadInput):
         handler.post(request)
     request = Request(
-        path=f'{state_id}/', body={'action': 'move', 'movements': []},
+        path=f'{state_id}/',
+        body={'action': 'move', 'movements': []},
     )
 
     with pytest.raises(BadInput):
