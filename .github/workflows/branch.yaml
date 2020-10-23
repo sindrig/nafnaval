@@ -57,6 +57,8 @@ jobs:
             ${{ runner.os }}-pip-
             ${{ runner.os }}-
 
+      - run: ls ~/.cache/pip
+
       - name: Install dependencies
         if: steps.pip-packages.outputs.cache-hit != 'true'
         run: pip install -r backend/requirements.txt -r backend/test-requirements.txt
