@@ -1,5 +1,5 @@
 locals {
-  code_path = "${path.module}/../../dist/code.zip"
+  code_path = "${path.module}/../../../dist/code.zip"
 }
 
 resource "aws_s3_bucket" "lambdaholder" {
@@ -20,9 +20,6 @@ resource "aws_s3_bucket_object" "code" {
 resource "aws_lambda_function" "namelambda" {
   s3_bucket = aws_s3_bucket.lambdaholder.id
   s3_key    = aws_s3_bucket_object.code.id
-
-  # While broken, use this for prod...
-  # s3_key = "a9d0c820fbb96b8c353b868daf6f7c24cf75a04e/code.zip"
 
   function_name = var.lambda_function_name
 

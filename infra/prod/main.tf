@@ -211,7 +211,7 @@ resource "aws_cloudwatch_log_group" "log_group" {
 }
 
 module "nafnaval" {
-  source               = "../nafnaval"
+  source               = "../modules/nafnaval"
   dynamo_table_name    = local.dynamo_table_name
   lambda_function_name = local.lambda_function_name
 }

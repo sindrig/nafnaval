@@ -13,3 +13,7 @@ output "rest_api_id" {
 output "source_code" {
   value = "s3://${aws_s3_bucket.lambdaholder.id}/${aws_s3_bucket_object.code.id}"
 }
+
+output "source_code_bucket" {
+  value = aws_s3_bucket.lambdaholder.id
+}

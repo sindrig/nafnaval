@@ -1,8 +1,8 @@
 provider "aws" {
   region = "us-east-1"
 
-  access_key                  = "123"
-  secret_key                  = "xyz"
+  access_key                  = "foo"
+  secret_key                  = "bar"
   skip_credentials_validation = true
   skip_requesting_account_id  = true
   skip_metadata_api_check     = true
@@ -18,7 +18,7 @@ provider "aws" {
 }
 
 module "nafnaval" {
-  source               = "../nafnaval"
+  source               = "../modules/nafnaval"
   dynamo_table_name    = "dev-nafnaval-names"
   lambda_function_name = "dev-nafnaval-api-lambda"
   iam_resource_suffix  = "dev"

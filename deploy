@@ -12,6 +12,9 @@ fi
 
 (
     cd infra/$TARGET
+    if [[ ! -d .terraform ]]; then
+        terraform init
+    fi
     terraform apply $TERRAFORM_ARGS
 )
 

@@ -3,7 +3,8 @@ name: Staging deployment
 on:
   push:
     branches:
-      - 'master'
+      - master
+      - maintenance
 
 
 jobs:
@@ -16,4 +17,7 @@ jobs:
           fetch-depth: 0
 
       - name: Deploy staging
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: make target=staging deploy

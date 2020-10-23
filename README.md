@@ -14,6 +14,6 @@ Run the front-end:
 
 ## Deploying manually
 
-    make target=dev deploy
+    make test-env
     make target=staging deploy
     make target=prod deploy
