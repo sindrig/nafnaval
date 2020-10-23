@@ -54,7 +54,7 @@ def test_missing_gender():
     with pytest.raises(BadInput) as exc:
         handler.put(request)
 
-    exp_err = 'Missing or invalid gender (either "male" or "female")'
+    exp_err = 'Missing or invalid gender (either "male", "female" or "both")'
     assert exc.value.error == exp_err
 
 
@@ -72,7 +72,7 @@ def test_invalid_gender():
     with pytest.raises(BadInput) as exc:
         handler.put(request)
 
-    exp_err = 'Missing or invalid gender (either "male" or "female")'
+    exp_err = 'Missing or invalid gender (either "male", "female" or "both")'
     assert exc.value.error == exp_err
 
 
