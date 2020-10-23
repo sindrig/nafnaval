@@ -22,7 +22,8 @@ jobs:
           python-version: 3.8
 
       - name: Install virtualenv
-        run: sudo apt-get update && sudo apt-get install -y python3-venv
+        run: pip install virtualenv
+        # run: sudo apt-get update && sudo apt-get install -y python3-venv
 
       - name: Deploy staging
         env:
