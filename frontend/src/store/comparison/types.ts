@@ -1,45 +1,43 @@
-import { List } from 'immutable';
-
+import { List } from 'immutable'
 
 export interface Progress {
-    self: number
-    counterpart: number
+  self: number
+  counterpart: number
 }
 
 interface Compare {
-    progress: Progress
-    names: List<string>
+  progress: Progress
+  names: List<string>
 }
 
 export interface CompareState extends Compare {
-    initializing: boolean
+  initializing: boolean
 }
 
 interface ErrorType {
-    error: string
+  error: string
 }
-
-
 
 export enum ActionTypes {
-    GET_COMPARISON_DONE = 'GET_COMPARISON_DONE',
-    ERROR = 'ERROR',
-    LOADING_COMPARISON = 'LOADING_COMPARISON',
+  GET_COMPARISON_DONE = 'GET_COMPARISON_DONE',
+  ERROR = 'ERROR',
+  LOADING_COMPARISON = 'LOADING_COMPARISON',
 }
-
-
 
 interface GetComparisonStarted {
-    type: typeof ActionTypes.LOADING_COMPARISON
+  type: typeof ActionTypes.LOADING_COMPARISON
 }
 interface GetComparisonDone {
-    type: typeof ActionTypes.GET_COMPARISON_DONE
-    payload: Compare
+  type: typeof ActionTypes.GET_COMPARISON_DONE
+  payload: Compare
 }
 
 interface Error {
-    type: typeof ActionTypes.ERROR
-    payload: ErrorType
+  type: typeof ActionTypes.ERROR
+  payload: ErrorType
 }
 
-export type ComparsionActionTypes = GetComparisonDone | GetComparisonStarted | Error;
+export type ComparsionActionTypes =
+  | GetComparisonDone
+  | GetComparisonStarted
+  | Error

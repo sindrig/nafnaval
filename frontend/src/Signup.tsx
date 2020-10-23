@@ -1,26 +1,25 @@
-import React, { useState } from 'react';
-import { connect, ConnectedProps } from 'react-redux';
-import { Redirect } from 'react-router';
-import { Dispatch, Action, bindActionCreators } from 'redux';
-import { signUp as signUpAction } from './store/names/actions';
-import { IStoreState } from './store/reducer';
-import useForm from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
+import React, { useState } from 'react'
+import { connect, ConnectedProps } from 'react-redux'
+import { Redirect } from 'react-router'
+import { Dispatch, Action, bindActionCreators } from 'redux'
+import { signUp as signUpAction } from './store/names/actions'
+import { IStoreState } from './store/reducer'
+import useForm from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
 
-import Button from '@material-ui/core/Button';
-import TextField from '@material-ui/core/TextField';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Grid from '@material-ui/core/Grid';
-import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
-import Container from '@material-ui/core/Container';
-import Radio from '@material-ui/core/Radio';
-import RadioGroup from '@material-ui/core/RadioGroup';
+import Button from '@material-ui/core/Button'
+import TextField from '@material-ui/core/TextField'
+import FormControlLabel from '@material-ui/core/FormControlLabel'
+import Grid from '@material-ui/core/Grid'
+import Typography from '@material-ui/core/Typography'
+import { makeStyles } from '@material-ui/core/styles'
+import Container from '@material-ui/core/Container'
+import Radio from '@material-ui/core/Radio'
+import RadioGroup from '@material-ui/core/RadioGroup'
 
-import './App.css';
+import './App.css'
 
-
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   paper: {
     marginTop: theme.spacing(8),
     display: 'flex',
@@ -34,19 +33,19 @@ const useStyles = makeStyles(theme => ({
   submit: {
     margin: theme.spacing(3, 0, 2),
   },
-}));
+}))
 
 function mapDispatchToProps(dispatch: Dispatch<Action>) {
   return {
-    signUp: bindActionCreators(signUpAction, dispatch)
-  };
+    signUp: bindActionCreators(signUpAction, dispatch),
+  }
 }
 
-function mapStateToProps({ names: { stateId }}: IStoreState) {
-  return { stateId };
+function mapStateToProps({ names: { stateId } }: IStoreState) {
+  return { stateId }
 }
 
-const connector = connect(mapStateToProps, mapDispatchToProps);
+const connector = connect(mapStateToProps, mapDispatchToProps)
 
 type PropsFromRedux = ConnectedProps<typeof connector>
 type Props = PropsFromRedux & {
@@ -60,12 +59,12 @@ interface SignupForm {
 }
 
 const Signup: React.FC<Props> = ({ signUp, stateId }: Props) => {
-  const [gender, setGender] = useState('female');
-  const { register, handleSubmit } = useForm<SignupForm>();
-  const { t } = useTranslation();
-  const classes = useStyles();
-  const onSubmit = ({email1, email2}: SignupForm) => {
-    signUp(email1, email2, gender);
+  const [gender, setGender] = useState('female')
+  const { register, handleSubmit } = useForm<SignupForm>()
+  const { t } = useTranslation()
+  const classes = useStyles()
+  const onSubmit = ({ email1, email2 }: SignupForm) => {
+    signUp(email1, email2, gender)
   }
   if (stateId) {
     return <Redirect to={`/${stateId}`} />
@@ -89,7 +88,7 @@ const Signup: React.FC<Props> = ({ signUp, stateId }: Props) => {
                 autoFocus
                 type="email"
                 inputRef={register}
-                inputProps={{ "data-testid": "your-email-input" }}
+                inputProps={{ 'data-testid': 'your-email-input' }}
               />
             </Grid>
             <Grid item xs={12}>
@@ -101,22 +100,26 @@ const Signup: React.FC<Props> = ({ signUp, stateId }: Props) => {
                 label={t('Partner e-mail')}
                 type="email"
                 inputRef={register}
-                inputProps={{ "data-testid": "partner-email-input" }}
+                inputProps={{ 'data-testid': 'partner-email-input' }}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
-
-              <RadioGroup aria-label="gender" name="gender" value={gender} onChange={(event) => setGender(event.target.value)}>
+              <RadioGroup
+                aria-label="gender"
+                name="gender"
+                value={gender}
+                onChange={(event) => setGender(event.target.value)}
+              >
                 <FormControlLabel
                   value="female"
-                  control={<Radio color="primary"/>}
-                  label={t("Female")}
+                  control={<Radio color="primary" />}
+                  label={t('Female')}
                   innerRef={register}
                 />
                 <FormControlLabel
                   value="male"
-                  control={<Radio color="primary" data-testid="male-radio"/>}
-                  label={t("Male")}
+                  control={<Radio color="primary" data-testid="male-radio" />}
+                  label={t('Male')}
                   innerRef={register}
                 />
               </RadioGroup>
@@ -136,7 +139,7 @@ const Signup: React.FC<Props> = ({ signUp, stateId }: Props) => {
         </form>
       </div>
     </Container>
-  );
+  )
 }
 
 export default connector(Signup)
