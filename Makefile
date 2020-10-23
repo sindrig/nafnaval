@@ -5,10 +5,13 @@ build:
 	./build_backend.sh
 	./build_frontend.sh
 
+tfinit:
+	if [ ! -d infra/$(target)/.terraform ]; then cd infra/$(target) && terraform init; fi
+
 clean:
 	rm -rf dist
 
-deploy: wire clean build
+deploy: tfinit wire clean build
 	./deploy $(target)
 
 test-env:
