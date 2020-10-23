@@ -2,8 +2,8 @@ wire:
 	./wire.sh $(target)
 
 build:
-	./build_backend
-	./build_frontend
+	./build_backend.sh
+	./build_frontend.sh
 
 clean:
 	rm -rf dist

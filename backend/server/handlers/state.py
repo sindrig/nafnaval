@@ -29,10 +29,10 @@ class StateHandler(BaseHandler):
         email1 = self._get_and_validate_email(request.body, 'email1')
         email2 = self._get_and_validate_email(request.body, 'email2')
         gender = request.body.get('gender')
-        if gender not in (names.MALE, names.FEMALE):
+        if gender not in (names.MALE, names.FEMALE, names.BOTH):
             raise BadInput(
                 'Missing or invalid gender (either '
-                f'"{names.MALE}" or "{names.FEMALE}")'
+                f'"{names.MALE}", "{names.FEMALE}" or "{names.BOTH}")'
             )
         name_list = names.get(gender)
         state_id = str(uuid.uuid4())

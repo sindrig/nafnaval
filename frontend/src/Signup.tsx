@@ -122,6 +122,12 @@ const Signup: React.FC<Props> = ({ signUp, stateId }: Props) => {
                   label={t('Male')}
                   innerRef={register}
                 />
+                <FormControlLabel
+                  value="both"
+                  control={<Radio color="primary" data-testid="both-radio" />}
+                  label={t('Both')}
+                  innerRef={register}
+                />
               </RadioGroup>
             </Grid>
             <Grid item xs={12} sm={6}>

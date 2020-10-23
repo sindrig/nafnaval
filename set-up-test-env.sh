@@ -6,7 +6,9 @@ AWS_ACCESS_KEY_ID=foo
 AWS_SECRET_ACCESS_KEY=bar
 ENDPOINT=http://localhost:4566
 
-docker-compose down -v
+docker-compose down -v &
+./build_backend.sh
+wait
 # rm -rf /tmp/localstack
 rm -f infra/dev/terraform.tfstate
 docker-compose up -d
