@@ -11,3 +11,9 @@ Start your local backend:
 Run the front-end:
 
     yarn start
+
+## Deploying manually
+
+    make target=dev deploy
+    make target=staging deploy
+    make target=prod deploy

@@ -1,3 +1,6 @@
+wire:
+	./wire.sh $(target)
+
 build:
 	./build_backend
 	./build_frontend
@@ -5,8 +8,8 @@ build:
 clean:
 	rm -rf dist
 
-deploy: clean build
-	./deploy
+deploy: wire clean build
+	./deploy $(target)
 
 test-env:
 	./set-up-test-env.sh

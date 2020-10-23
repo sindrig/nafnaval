@@ -3,5 +3,6 @@ set -e
 
 (
     cd frontend
-    npm run build
+    yarn install --frozen-lockfile
+    yarn build
 )

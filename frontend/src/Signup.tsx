@@ -89,6 +89,7 @@ const Signup: React.FC<Props> = ({ signUp, stateId }: Props) => {
                 autoFocus
                 type="email"
                 inputRef={register}
+                inputProps={{ "data-testid": "your-email-input" }}
               />
             </Grid>
             <Grid item xs={12}>
@@ -100,6 +101,7 @@ const Signup: React.FC<Props> = ({ signUp, stateId }: Props) => {
                 label={t('Partner e-mail')}
                 type="email"
                 inputRef={register}
+                inputProps={{ "data-testid": "partner-email-input" }}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -113,7 +115,7 @@ const Signup: React.FC<Props> = ({ signUp, stateId }: Props) => {
                 />
                 <FormControlLabel
                   value="male"
-                  control={<Radio color="primary"/>}
+                  control={<Radio color="primary" data-testid="male-radio"/>}
                   label={t("Male")}
                   innerRef={register}
                 />

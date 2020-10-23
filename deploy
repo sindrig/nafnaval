@@ -4,6 +4,11 @@ set -euxo pipefail
 
 TARGET=$1
 
+(
+    cd infra/$TARGET
+    terraform apply
+)
+
 FRONTEND_BUCKET=`cd infra/$TARGET && terraform output frontendbucket`
 
 aws s3 sync frontend/build s3://$FRONTEND_BUCKET
