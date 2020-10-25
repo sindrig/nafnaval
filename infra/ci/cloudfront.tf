@@ -4,7 +4,7 @@ module "cloudfront-permissions" {
   user   = aws_iam_user.nafnaval-staging.name
   statements = [
     {
-      actions = ["cloudfront:GetDistribution", "cloudfront:ListTagsForResource"]
+      actions = ["cloudfront:GetDistribution", "cloudfront:ListTagsForResource", "cloudfront:CreateInvalidation"]
       resources = [
         "arn:aws:cloudfront:*:${data.aws_caller_identity.current.account_id}:distribution/${data.terraform_remote_state.staging.outputs.cloudfront}",
         "arn:aws:cloudfront:*:${data.aws_caller_identity.current.account_id}:distribution/${data.terraform_remote_state.staging.outputs.root_cloudfront}"
