@@ -16,6 +16,11 @@ docker-compose up -d
 while ! aws s3 ls --endpoint=$ENDPOINT; do
     docker ps
     docker-compose logs
+    set +e
+    curl localhost:4566
+    curl 127.0.0.1:4566
+    curl 0.0.0.0:4566
+    set -e
     sleep 10
 done
 
