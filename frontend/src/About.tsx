@@ -22,7 +22,7 @@ Written and hosted by [Sindri Guðmundsson](https://irdn.is).
 
 ## Problems?
 
-Contact me (links to social feeds on my page)!
+Contact me (links to social feeds on my [page](https://irdn.is))!
 `
 export default () => (
   <div className="about">
