@@ -73,5 +73,8 @@ jobs:
         with:
           python-version: 3.8
 
+      - name: Install virtualenv
+        run: pip install virtualenv
+
       - name: Start backend
         run: make test-env
