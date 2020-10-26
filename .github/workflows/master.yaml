@@ -21,7 +21,6 @@ jobs:
 
       - name: Install virtualenv
         run: pip install virtualenv
-        # run: sudo apt-get update && sudo apt-get install -y python3-venv
 
       - name: Deploy staging
         env:

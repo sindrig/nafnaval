@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -exuo pipefail
 
+AWS_ACCESS_KEY_ID=foo
+AWS_SECRET_ACCESS_KEY=bar
+AWS_REGION=eu-west-1
+
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 AWS_ACCESS_KEY_ID=foo
 AWS_SECRET_ACCESS_KEY=bar
@@ -14,14 +18,7 @@ rm -f infra/dev/terraform.tfstate
 docker-compose up -d
 
 while ! aws s3 ls --endpoint=$ENDPOINT; do
-    docker ps
-    docker-compose logs
-    set +e
-    curl localhost:4566
-    curl 127.0.0.1:4566
-    curl 0.0.0.0:4566
-    set -e
-    sleep 10
+    sleep 0.1
 done
 
 (
