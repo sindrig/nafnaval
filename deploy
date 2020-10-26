@@ -2,9 +2,6 @@
 
 set -euxo pipefail
 
-aws --version
-exit 1
-
 TARGET=$1
 
 if [[ "$TARGET" == "staging" ]]; then
