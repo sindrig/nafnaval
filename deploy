@@ -3,7 +3,7 @@
 set -euxo pipefail
 
 sudo apt-get install tree
-tree .
+tree . -I 'backend|node_modules|venv|dist'
 
 TARGET=$1
 
