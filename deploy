@@ -2,8 +2,8 @@
 
 set -euxo pipefail
 
-sudo apt-get install tree
-tree . -I 'backend|node_modules|venv|dist'
+aws --version
+exit 1
 
 TARGET=$1
 
