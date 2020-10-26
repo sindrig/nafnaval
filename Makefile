@@ -15,4 +15,5 @@ deploy: tfinit wire clean build
 	./deploy $(target)
 
 test-env:
+	make target=dev tfinit
 	./set-up-test-env.sh
