@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 set -exuo pipefail
 
-AWS_ACCESS_KEY_ID=foo
-AWS_SECRET_ACCESS_KEY=bar
-AWS_REGION=eu-west-1
+export AWS_ACCESS_KEY_ID=foo
+export AWS_SECRET_ACCESS_KEY=bar
+export AWS_REGION=eu-west-1
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 AWS_ACCESS_KEY_ID=foo
