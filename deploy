@@ -2,6 +2,7 @@
 
 set -euxo pipefail
 
+sudo apt-get install tree
 tree
 
 TARGET=$1
