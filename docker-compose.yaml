@@ -2,7 +2,7 @@ version: '2.1'
 
 services:
   localstack:
-    container_name: "localstack_main"
+    container_name: localstack_main
     image: localstack/localstack
     network_mode: bridge
     ports:

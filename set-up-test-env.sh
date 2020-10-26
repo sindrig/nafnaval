@@ -14,7 +14,9 @@ rm -f infra/dev/terraform.tfstate
 docker-compose up -d
 
 while ! aws s3 ls --endpoint=$ENDPOINT; do
-    sleep 0.1
+    docker ps
+    docker-compose logs
+    sleep 10
 done
 
 (
