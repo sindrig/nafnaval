@@ -1,0 +1,35 @@
+name: Update names
+
+on:
+  schedule:
+    # Run at 10 every monday
+    cron: '0 10 * * 1'
+  push:
+
+jobs:
+  backend:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          ref: master
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - name: Install dependencies
+        run: pip install requests beautifulsoup
+
+      - name: Update allowed names
+        run: python update_allowed_names.py
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v3
+        commit-message: Update allowed names from Hagstofa
+        delete-branch: true
+        title: Update allowed names from Hagstofa
+        body: Automatic update of allowed Icelandic names
+        reviewers: sindrig
