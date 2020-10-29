@@ -26,11 +26,26 @@ jobs:
       - name: Update allowed names
         run: python update_allowed_names.py
 
+      - name: Create PR body
+        id: get-pr-body
+        run:
+          function gather() {
+            git diff $1| grep -E '^\+\s+"\w+",' | sed -E 's/\+\s+"(\w+)",/\1/g'
+          }
+          export MALE_NAMES=$(gather backend/server/names/male.json )
+          export FEMALE_NAMES=$(gather backend/server/names/female.json )
+          body=$(cat update-names-pr-body.txt | envsubst)
+          body="${body//'%'/'%25'}"
+          body="${body//$'\n'/'%0A'}"
+          body="${body//$'\r'/'%0D'}"
+          echo ::set-output name=body::$body
+
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v3
         with:
           commit-message: Update allowed names from Hagstofa
           delete-branch: true
+          branch: update-allowed-names
           title: Update allowed names from Hagstofa
-          body: Automatic update of allowed Icelandic names
+          body: ${{ steps.get-pr-body.outputs.body }}
           reviewers: sindrig
