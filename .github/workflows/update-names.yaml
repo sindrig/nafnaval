@@ -28,7 +28,6 @@ jobs:
 
       - name: Create PR body
         id: get-pr-body
-        shell: bash
         run: |
           function gather() { git diff $1 | grep -E '^\+\s+"\w+",' | sed -E 's/\+\s+"(\w+)",/\1/g'; }
           export MALE_NAMES=$(gather backend/server/names/male.json )
