@@ -7,7 +7,8 @@ on:
   push:
 
 jobs:
-  backend:
+  update:
+    name: Update names
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
@@ -21,7 +22,7 @@ jobs:
           python-version: 3.8
 
       - name: Install dependencies
-        run: pip install requests beautifulsoup
+        run: pip install requests beautifulsoup4
 
       - name: Update allowed names
         run: python update_allowed_names.py
