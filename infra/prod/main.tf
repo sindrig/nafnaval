@@ -235,3 +235,27 @@ output "frontendbucket" {
 output "cloudfront" {
   value = aws_cloudfront_distribution.www_distribution.id
 }
+
+output "root_cloudfront" {
+  value = aws_cloudfront_distribution.root_distribution.id
+}
+
+output "certificate_arn" {
+  value = aws_acm_certificate.certificate.arn
+}
+
+output "rest_api_id" {
+  value = module.nafnaval.rest_api_id
+}
+
+output "source_code_bucket" {
+  value = module.nafnaval.source_code_bucket
+}
+
+output "rootbucket" {
+  value = aws_s3_bucket.root.bucket
+}
+
+output "lambda_function_name" {
+  value = local.lambda_function_name
+}

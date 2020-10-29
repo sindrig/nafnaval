@@ -23,11 +23,21 @@ data "terraform_remote_state" "staging" {
   }
 }
 
-resource "aws_iam_user" "nafnaval-staging" {
-  name = "nafnaval-staging"
+data "terraform_remote_state" "prod" {
+  backend = "s3"
+
+  config = {
+    bucket = "nafnaval-is-terraform-state"
+    region = "eu-west-1"
+    key    = "prod/terraform.tfstate"
+  }
+}
+
+resource "aws_iam_user" "nafnaval" {
+  name = "nafnaval-ci"
 }
 
 
 resource "aws_iam_access_key" "access-key" {
-  user = aws_iam_user.nafnaval-staging.name
+  user = aws_iam_user.nafnaval.name
 }

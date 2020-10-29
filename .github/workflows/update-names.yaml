@@ -46,3 +46,4 @@ jobs:
           title: Update allowed names from Hagstofa
           body: ${{ steps.get-pr-body.outputs.body }}
           reviewers: sindrig
+          labels: automerge

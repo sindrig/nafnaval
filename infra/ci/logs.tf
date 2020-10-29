@@ -1,7 +1,7 @@
 module "logs-permissions" {
   source = "../modules/permission"
-  name   = "logs-staging"
-  user   = aws_iam_user.nafnaval-staging.name
+  name   = "logs"
+  user   = aws_iam_user.nafnaval.name
   statements = [
     {
       actions   = ["logs:DescribeLogGroups", "logs:ListTagsLogGroup"],
