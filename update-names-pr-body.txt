@@ -1,0 +1,9 @@
+## Automatic update of allowed names
+
+### New male names
+
+$MALE_NAMES
+
+### New female names
+
+$FEMALE_NAMES
