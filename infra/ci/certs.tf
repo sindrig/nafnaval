@@ -1,7 +1,7 @@
 module "certs-permissions" {
   source = "../modules/permission"
-  name   = "certs-staging"
-  user   = aws_iam_user.nafnaval-staging.name
+  name   = "certs"
+  user   = aws_iam_user.nafnaval.name
   statements = [
     {
       actions   = ["acm:ListCertificates"],
@@ -9,7 +9,7 @@ module "certs-permissions" {
     },
     {
       actions   = ["acm:DescribeCertificate", "acm:ListTagsForCertificate"],
-      resources = [data.terraform_remote_state.staging.outputs.certificate_arn]
+      resources = [data.terraform_remote_state.staging.outputs.certificate_arn, data.terraform_remote_state.prod.outputs.certificate_arn]
     }
   ]
 }

@@ -1,4 +1,4 @@
-name: Code checks
+name: CI/CD
 
 on:
   push:
@@ -78,3 +78,46 @@ jobs:
 
       - name: Start backend
         run: make test-env
+
+
+  deploy:
+    runs-on: ubuntu-20.04
+
+    depends_on:
+      - backend
+      - frontend
+      - integration
+
+    if: github.ref == 'refs/heads/master'
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 0.13.5
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - name: Install virtualenv
+        run: pip install virtualenv
+
+      - name: Deploy staging
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: eu-west-1
+        run: make target=staging deploy
+
+      # TODO: Sanity check staging here
+
+      - name: Deploy prod
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: eu-west-1
+        run: make target=prod deploy
