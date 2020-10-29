@@ -43,7 +43,7 @@ jobs:
         with:
           commit-message: Update allowed names from Hagstofa
           delete-branch: true
-          branch: update-allowed-names
+          branch-suffix: timestamp
           title: Update allowed names from Hagstofa
           body: ${{ steps.get-pr-body.outputs.body }}
           reviewers: sindrig
