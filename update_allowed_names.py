@@ -16,7 +16,7 @@ result_folder = os.path.join(base, 'backend', 'server', 'names')
 
 def main():
     r = requests.get(
-        'https://www.island.is/mannanofn/leit-ad-nafni/',
+        'https://vefur.island.is/mannanofn/leit-ad-nafni/',
         params={'Nafn': '', 'Stulkur': 'on', 'Drengir': 'on'},
     )
     r.raise_for_status()
