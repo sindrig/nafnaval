@@ -28,8 +28,9 @@ jobs:
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v3
-        commit-message: Update allowed names from Hagstofa
-        delete-branch: true
-        title: Update allowed names from Hagstofa
-        body: Automatic update of allowed Icelandic names
-        reviewers: sindrig
+        with:
+          commit-message: Update allowed names from Hagstofa
+          delete-branch: true
+          title: Update allowed names from Hagstofa
+          body: Automatic update of allowed Icelandic names
+          reviewers: sindrig
