@@ -1,0 +1,80 @@
+name: Code checks
+
+on:
+  push:
+
+jobs:
+  frontend:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - uses: actions/cache@v2
+        name: Node modules cache
+        id: node-modules
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-modules-${{ hashFiles('frontend/yarn.lock') }}
+
+      - name: Install yarn packages
+        if: steps.node-modules.outputs.cache-hit != 'true'
+        run: |
+          cd frontend
+          yarn install
+
+      - name: Prettier frontend
+        run: |
+          cd frontend
+          yarn prettier . --check
+
+      - name: Test frontend
+        run: |
+          cd frontend
+          yarn test --ci
+
+
+  backend:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - name: Install dependencies
+        run: pip install -r backend/requirements.txt -r backend/test-requirements.txt
+
+      - name: Black backend
+        run: |
+          cd backend
+          black . --check
+
+      - name: Test backend
+        run: |
+          cd backend
+          pytest .
+
+
+  integration:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - name: Install virtualenv
+        run: pip install virtualenv
+
+      - name: Start backend
+        run: make test-env

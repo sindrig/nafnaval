@@ -1,18 +1,23 @@
 #!/usr/bin/env bash
 
-set -e
+set -euxo pipefail
 
-CODE_VERSION=`git log -1 --pretty=format:"%H"`
-CODE_BUCKET=`terraform output codebucket`
-if aws s3 ls s3://$CODE_BUCKET/$CODE_VERSION/code.zip; then
-    echo "Code exists on s3, skipping"
+TARGET=$1
+
+if [[ "$TARGET" == "staging" ]]; then
+    TERRAFORM_ARGS='-auto-approve'
 else
-    aws s3 cp dist/code.zip s3://$CODE_BUCKET/$CODE_VERSION/code.zip
+    TERRAFORM_ARGS=''
 fi
-terraform apply -var="app_version=$CODE_VERSION" -auto-approve
 
-FRONTEND_BUCKET=`terraform output frontendbucket`
+(
+    cd infra/$TARGET
+    terraform apply $TERRAFORM_ARGS
+)
+
+FRONTEND_BUCKET=`cd infra/$TARGET && terraform output frontendbucket`
+
 
 aws s3 sync frontend/build s3://$FRONTEND_BUCKET
-aws cloudfront create-invalidation --distribution-id `terraform output cloudfront` --paths "/index.html"
+aws cloudfront create-invalidation --distribution-id `cd infra/$TARGET && terraform output cloudfront` --paths "/index.html"
 
