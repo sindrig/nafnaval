@@ -15,7 +15,7 @@ fi
     terraform apply $TERRAFORM_ARGS
 )
 
-FRONTEND_BUCKET=`cd infra/$TARGET && terraform output frontendbucket`
+FRONTEND_BUCKET=$(cd infra/$TARGET && terraform output frontendbucket)
 
 
 aws s3 sync frontend/build s3://$FRONTEND_BUCKET
