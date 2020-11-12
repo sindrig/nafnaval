@@ -4,18 +4,24 @@ services:
   localstack:
     container_name: localstack_main
     image: localstack/localstack
-    network_mode: bridge
     ports:
       - "4566:4566"
-      - "4567:4567"
-      - "4571:4571"
-      - "8080:8080"
+      - "8000:8000"
     environment:
       - SERVICES=s3,iam,dynamodb,apigateway,lambda,cloudwatchlogs,ses
       - DEBUG=1
-      - PORT_WEB_UI=8080
+      - PORT_WEB_UI=8000
       - LAMBDA_EXECUTOR=docker
+      - LAMBDA_DOCKER_NETWORK=nafnaval_default
       - DOCKER_HOST=unix:///var/run/docker.sock
     volumes:
       - "/tmp/localstack:/tmp/localstack"
       - "/var/run/docker.sock:/var/run/docker.sock"
+  frontend:
+    image: nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - ./infra/dev/nginx:/etc/nginx/conf.d/
+    depends_on:
+      - localstack

@@ -77,8 +77,8 @@ jobs:
       - name: Install virtualenv
         run: pip install virtualenv
 
-      - name: Start backend
-        run: make test-env
+      - name: Start local environment
+        run: make local-env
 
 
   deploy:

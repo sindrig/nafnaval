@@ -27,8 +27,59 @@ module "nafnaval" {
   }
 }
 
+resource "aws_s3_bucket" "www" {
+  bucket = "nafnaval"
+  acl    = "public-read"
+  policy = <<POLICY
+{
+  "Version":"2012-10-17",
+  "Statement":[
+    {
+      "Sid":"AddPerm",
+      "Effect":"Allow",
+      "Principal": "*",
+      "Action":["s3:GetObject"],
+      "Resource":["arn:aws:s3:::nafnaval/*"]
+    }
+  ]
+}
+POLICY
+
+  website {
+    index_document = "index.html"
+    error_document = "index.html"
+  }
+}
+
+resource "local_file" "local-env-json" {
+  content  = local.env_content
+  filename = "${path.module}/../../frontend/public/env.json"
+}
+
+resource "aws_s3_bucket_object" "object" {
+  bucket  = aws_s3_bucket.www.id
+  key     = "env.json"
+  content = local.env_content
+
+  content_type = "application/json"
+}
+
+locals {
+  base_url    = "http://localhost:4566/restapis/${module.nafnaval.rest_api_id}/stage/_user_request_/"
+  env_content = <<CONTENT
+{
+  "baseURL": "${local.base_url}"
+}
+CONTENT
+}
+
+
+output "frontendbucket" {
+  value = aws_s3_bucket.www.bucket
+}
+
 output "base_url" {
-  value = "http://localhost:4566/restapis/${module.nafnaval.rest_api_id}/stage/_user_request_/"
+  value = local.base_url
 }
 
 output "names_table" {

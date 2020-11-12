@@ -6,14 +6,16 @@ A free service for soon-to-be parents that need to select valid Icelandic names 
 
 Start your local backend:
 
-    make test-env
+    make local-env
 
-Run the front-end:
+A production build will be available at [localhost:8080](http://localhost:8080).
 
+You can of course run the front-end:
+
+    cd frontend
     yarn start
 
 ## Deploying manually
 
-    make test-env
     make target=staging deploy
     make target=prod deploy
