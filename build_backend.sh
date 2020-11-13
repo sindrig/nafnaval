@@ -14,5 +14,5 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
     pip install -r requirements.txt -t $DIR/dist
     cp -r main.py server $DIR/dist
     cd $DIR/dist
-    zip -r9 code.zip .
+    zip -r9 code.zip . > /dev/null
 )

@@ -65,7 +65,7 @@ const ShowSelection: React.FC<Props> = ({ names, actions = [] }: Props) => {
                 <List dense>
                   {nameMap.get(letter)!.map((name) => {
                     return (
-                      <ListItem key={name}>
+                      <ListItem key={name} className="listitem-name">
                         <ListItemText primary={name} />
                         {actions.length > 0 ? (
                           <ListItemSecondaryAction>

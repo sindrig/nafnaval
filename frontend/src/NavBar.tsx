@@ -114,10 +114,12 @@ const NavBar: React.FC<Props> = ({
             <MenuItem
               primaryText="Íslenska"
               onClick={() => i18n.changeLanguage('is')}
+              data-testid="i18n-icelandic"
             />
             <MenuItem
               primaryText="English"
               onClick={() => i18n.changeLanguage('en')}
+              data-testid="i18n-english"
             />
           </IconMenu>
         </span>
