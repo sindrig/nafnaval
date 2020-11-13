@@ -77,8 +77,24 @@ jobs:
       - name: Install virtualenv
         run: pip install virtualenv
 
-      - name: Start backend
-        run: make test-env
+      - uses: actions/cache@v2
+        name: Node modules cache
+        id: node-modules
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-modules-${{ hashFiles('frontend/yarn.lock') }}
+
+      - name: Start local environment
+        run: make local-env
+
+      - name: Cypress run dev
+        uses: cypress-io/github-action@v2
+        with:
+          working-directory: ./frontend
+          record: true
+        env:
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 
   deploy:
@@ -119,7 +135,16 @@ jobs:
           AUTO_APPROVE_TF: true
         run: make target=staging deploy
 
-      # TODO: Sanity check staging here
+
+      - name: Cypress run staging
+        uses: cypress-io/github-action@v2
+        with:
+          config: baseUrl=https://stagingwww.nafnaval.is
+          working-directory: ./frontend
+          record: true
+        env:
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Deploy prod
         env:

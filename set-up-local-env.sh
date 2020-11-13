@@ -9,25 +9,21 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 AWS_ACCESS_KEY_ID=foo
 AWS_SECRET_ACCESS_KEY=bar
 ENDPOINT=http://localhost:4566
+export AWS_EXECUTABLE="aws --endpoint=$ENDPOINT"
 
-docker-compose down -v &
-./build_backend.sh
-wait
-# rm -rf /tmp/localstack
+docker-compose down -v
 rm -f infra/dev/terraform.tfstate
 docker-compose up -d
 
-while ! aws s3 ls --endpoint=$ENDPOINT; do
+while ! $AWS_EXECUTABLE s3 ls; do
     sleep 0.1
 done
 
-(
-    cd infra/dev/
-    terraform apply -auto-approve
-)
+export AUTO_APPROVE_TF=true
+export CREATE_INVALIDATION=false
+make target=dev deploy
 
 users=( sindri gerdur heidur bjorn nafnaval )
 for user in "${users[@]}"; do
     aws ses verify-email-identity --email-address $user@nafnaval.is --region us-east-1 --endpoint-url=$ENDPOINT
 done
-$DIR/wire.sh dev

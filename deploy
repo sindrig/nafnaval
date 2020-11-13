@@ -4,6 +4,8 @@ set -euxo pipefail
 
 TARGET=$1
 AUTO_APPROVE_TF=${AUTO_APPROVE_TF:-false}
+CREATE_INVALIDATION=${CREATE_INVALIDATION:-true}
+AWS_EXECUTABLE=${AWS_EXECUTABLE:-aws}
 
 if [[ "$AUTO_APPROVE_TF" == "true" ]]; then
     TERRAFORM_ARGS='-auto-approve'
@@ -18,10 +20,15 @@ fi
 
 set +x
 FRONTEND_BUCKET=$(cd infra/$TARGET && terraform output frontendbucket)
-DISTRIBUTION_ID=$(cd infra/$TARGET && terraform output cloudfront)
 set -x
 
 
-aws s3 sync frontend/build s3://$FRONTEND_BUCKET
-aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID --paths "/index.html"
+$AWS_EXECUTABLE s3 sync frontend/build s3://$FRONTEND_BUCKET
+
+if [[ "$CREATE_INVALIDATION" == "true" ]]; then
+    set +x
+    DISTRIBUTION_ID=$(cd infra/$TARGET && terraform output cloudfront)
+    set -x
+    $AWS_EXECUTABLE cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID --paths "/index.html"
+fi
 

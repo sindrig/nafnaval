@@ -1,16 +1,26 @@
 import axios from 'axios'
 import { NameMovement } from './store/names/types'
+import { Environment } from './store/types'
 
-// TODO: Pull from terraform on build time
-const BASE_URL = process.env.REACT_APP_BASE_API_URL
+let envCache: Environment
 
-const apiClient = axios.create({
-  baseURL: BASE_URL,
-  responseType: 'json',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-})
+const getEnv = async () => {
+  if (!envCache) {
+    envCache = (await axios.get('/env.json')).data
+  }
+  return envCache
+}
+
+const getApiClient = async () => {
+  const { baseURL } = await getEnv()
+  return axios.create({
+    baseURL,
+    responseType: 'json',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+}
 
 export interface ErrorResponse {
   error: string
@@ -41,6 +51,7 @@ export const getNameState = async (
   id: string,
 ): Promise<NamesResponse | ErrorResponse> => {
   try {
+    const apiClient = await getApiClient()
     const response = await apiClient.get<NamesResponse>(`/state/${id}`)
     return response.data
   } catch (err) {
@@ -55,6 +66,7 @@ export const getComparison = async (
   id: string,
 ): Promise<ComparisonResponse | ErrorResponse> => {
   try {
+    const apiClient = await getApiClient()
     const response = await apiClient.get<ComparisonResponse>(`/compare/${id}`)
     return response.data
   } catch (err) {
@@ -70,6 +82,7 @@ export const saveMovements = async (
   movements: Array<NameMovement>,
 ): Promise<NamesResponse> => {
   try {
+    const apiClient = await getApiClient()
     const response = await apiClient.post<NamesResponse>(`/state/${id}`, {
       movements,
       action: 'move',
@@ -89,6 +102,7 @@ export const createState = async (
   gender: string,
 ): Promise<CreateStateResponse | ErrorResponse> => {
   try {
+    const apiClient = await getApiClient()
     const response = await apiClient.put<CreateStateResponse>(`/state/`, {
       email1,
       email2,

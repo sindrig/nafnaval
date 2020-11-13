@@ -1,6 +1,3 @@
-wire:
-	./wire.sh $(target)
-
 build:
 	./build_backend.sh
 	./build_frontend.sh
@@ -11,9 +8,9 @@ tfinit:
 clean:
 	rm -rf dist
 
-deploy: tfinit wire clean build
+deploy: tfinit clean build
 	./deploy $(target)
 
-test-env:
+local-env:
 	make target=dev tfinit
-	./set-up-test-env.sh
+	./set-up-local-env.sh

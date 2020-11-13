@@ -112,7 +112,7 @@ const Signup: React.FC<Props> = ({ signUp, stateId }: Props) => {
               >
                 <FormControlLabel
                   value="female"
-                  control={<Radio color="primary" />}
+                  control={<Radio color="primary" data-testid="female-radio" />}
                   label={t('Female')}
                   innerRef={register}
                 />
