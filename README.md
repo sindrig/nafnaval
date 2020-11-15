@@ -1,5 +1,7 @@
 # Nafnaval.is
 
+![CI/CD](https://github.com/sindrig/nafnaval/workflows/CI/CD/badge.svg)
+
 A free service for soon-to-be parents that need to select valid Icelandic names for their newborns.
 
 ## Development

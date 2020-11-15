@@ -58,7 +58,7 @@ POLICY
 resource "local_file" "local-env-json" {
   count    = var.write_local ? 1 : 0
   content  = local.env_content
-  filename = "${path.module}/../../frontend/public/env.json"
+  filename = "${path.module}/../../../frontend/public/env.json"
 }
 
 resource "aws_s3_bucket_object" "object" {
