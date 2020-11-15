@@ -31,31 +31,6 @@ resource "aws_acm_certificate" "certificate" {
   subject_alternative_names = ["nafnaval.is"]
 }
 
-resource "aws_s3_bucket" "www" {
-  bucket = local.www_domain_name
-  acl    = "public-read"
-  policy = <<POLICY
-{
-  "Version":"2012-10-17",
-  "Statement":[
-    {
-      "Sid":"AddPerm",
-      "Effect":"Allow",
-      "Principal": "*",
-      "Action":["s3:GetObject"],
-      "Resource":["arn:aws:s3:::${local.www_domain_name}/*"]
-    }
-  ]
-}
-POLICY
-
-  website {
-    index_document = "index.html"
-    error_document = "index.html"
-  }
-}
-
-
 resource "aws_cloudfront_distribution" "www_distribution" {
   origin {
     custom_origin_config {
@@ -65,7 +40,7 @@ resource "aws_cloudfront_distribution" "www_distribution" {
       origin_ssl_protocols   = ["TLSv1", "TLSv1.1", "TLSv1.2"]
     }
 
-    domain_name = aws_s3_bucket.www.website_endpoint
+    domain_name = module.frontend.website_endpoint
     origin_id   = local.www_domain_name
   }
 
@@ -120,29 +95,6 @@ resource "aws_route53_record" "www" {
   }
 }
 
-resource "aws_s3_bucket" "root" {
-  bucket = local.root_domain_name
-  acl    = "public-read"
-  policy = <<POLICY
-{
-  "Version":"2012-10-17",
-  "Statement":[
-    {
-      "Sid":"AddPerm",
-      "Effect":"Allow",
-      "Principal": "*",
-      "Action":["s3:GetObject"],
-      "Resource":["arn:aws:s3:::${local.root_domain_name}/*"]
-    }
-  ]
-}
-POLICY
-
-  website {
-    redirect_all_requests_to = "https://${local.www_domain_name}"
-  }
-}
-
 resource "aws_cloudfront_distribution" "root_distribution" {
   origin {
     custom_origin_config {
@@ -151,7 +103,7 @@ resource "aws_cloudfront_distribution" "root_distribution" {
       origin_protocol_policy = "http-only"
       origin_ssl_protocols   = ["TLSv1", "TLSv1.1", "TLSv1.2"]
     }
-    domain_name = aws_s3_bucket.root.website_endpoint
+    domain_name = module.frontend.root_website_endpoint
     origin_id   = local.root_domain_name
   }
 
@@ -211,10 +163,18 @@ resource "aws_cloudwatch_log_group" "log_group" {
 }
 
 module "nafnaval" {
-  source               = "../modules/nafnaval"
+  source               = "../modules/backend"
   dynamo_table_name    = local.dynamo_table_name
   lambda_function_name = local.lambda_function_name
 }
+
+module "frontend" {
+  source           = "../modules/frontend"
+  base_url         = module.nafnaval.base_url
+  www_domain_name  = local.www_domain_name
+  root_domain_name = local.root_domain_name
+}
+
 
 output "base_url" {
   value = module.nafnaval.base_url
@@ -229,7 +189,7 @@ output "names_table" {
 }
 
 output "frontendbucket" {
-  value = aws_s3_bucket.www.bucket
+  value = module.frontend.frontendbucket
 }
 
 output "cloudfront" {
@@ -253,7 +213,7 @@ output "source_code_bucket" {
 }
 
 output "rootbucket" {
-  value = aws_s3_bucket.root.bucket
+  value = module.frontend.rootbucket
 }
 
 output "lambda_function_name" {

@@ -18,7 +18,7 @@ provider "aws" {
 }
 
 module "nafnaval" {
-  source               = "../modules/nafnaval"
+  source               = "../modules/backend"
   dynamo_table_name    = "dev-nafnaval-names"
   lambda_function_name = "dev-nafnaval-api-lambda"
   iam_resource_suffix  = "dev"
@@ -27,55 +27,22 @@ module "nafnaval" {
   }
 }
 
-resource "aws_s3_bucket" "www" {
-  bucket = "nafnaval"
-  acl    = "public-read"
-  policy = <<POLICY
-{
-  "Version":"2012-10-17",
-  "Statement":[
-    {
-      "Sid":"AddPerm",
-      "Effect":"Allow",
-      "Principal": "*",
-      "Action":["s3:GetObject"],
-      "Resource":["arn:aws:s3:::nafnaval/*"]
-    }
-  ]
-}
-POLICY
 
-  website {
-    index_document = "index.html"
-    error_document = "index.html"
-  }
-}
-
-resource "local_file" "local-env-json" {
-  content  = local.env_content
-  filename = "${path.module}/../../frontend/public/env.json"
-}
-
-resource "aws_s3_bucket_object" "object" {
-  bucket  = aws_s3_bucket.www.id
-  key     = "env.json"
-  content = local.env_content
-
-  content_type = "application/json"
+module "frontend" {
+  source           = "../modules/frontend"
+  base_url         = local.base_url
+  www_domain_name  = "nafnaval"
+  root_domain_name = "root-nafnaval"
+  write_local      = true
 }
 
 locals {
-  base_url    = "http://localhost:4566/restapis/${module.nafnaval.rest_api_id}/stage/_user_request_/"
-  env_content = <<CONTENT
-{
-  "baseURL": "${local.base_url}"
-}
-CONTENT
+  base_url = "http://localhost:4566/restapis/${module.nafnaval.rest_api_id}/stage/_user_request_/"
 }
 
 
 output "frontendbucket" {
-  value = aws_s3_bucket.www.bucket
+  value = module.frontend.frontendbucket
 }
 
 output "base_url" {
