@@ -8,7 +8,7 @@ tfinit:
 clean:
 	rm -rf dist
 
-deploy: tfinit clean build
+deploy: tfinit
 	./deploy $(target)
 
 local-env:

@@ -84,6 +84,10 @@ jobs:
           path: '**/node_modules'
           key: ${{ runner.os }}-modules-${{ hashFiles('frontend/yarn.lock') }}
 
+      # TODO: Re-use built artifacts for staging+prod?
+      - name: Build
+        run: make
+
       - name: Start local environment
         run: make local-env
 
@@ -126,6 +130,9 @@ jobs:
 
       - name: Install virtualenv
         run: pip install virtualenv
+
+      - name: Build
+        run: make
 
       - name: Deploy staging
         env:
