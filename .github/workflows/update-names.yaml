@@ -2,8 +2,8 @@ name: Update names
 
 on:
   schedule:
-    # Run at 10 every monday
-    - cron: '0 10 * * 1'
+    # Run at 12 every tuesday
+    - cron: '0 12 * * 2'
 
 jobs:
   update:
