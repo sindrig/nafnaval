@@ -92,11 +92,22 @@ jobs:
       - name: Start local environment
         run: make local-env
 
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cache/Cypress
+            node_modules
+          key: cypress-${{ runner.os }}-${{ hashFiles('frontend/yarn.lock') }}
+
+      - run: npx cypress install
+        working-directory: ./frontend
+
       - name: Cypress run dev
         uses: cypress-io/github-action@v2
         with:
           working-directory: ./frontend
           record: true
+          install: false
         env:
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

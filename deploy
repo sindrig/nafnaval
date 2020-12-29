@@ -19,7 +19,7 @@ fi
 )
 
 set +x
-FRONTEND_BUCKET=$(cd infra/$TARGET && terraform output frontendbucket)
+FRONTEND_BUCKET=$(cd infra/$TARGET && terraform output frontendbucket | sed 's/"//g')
 set -x
 
 
@@ -27,7 +27,7 @@ $AWS_EXECUTABLE s3 sync frontend/build s3://$FRONTEND_BUCKET
 
 if [[ "$CREATE_INVALIDATION" == "true" ]]; then
     set +x
-    DISTRIBUTION_ID=$(cd infra/$TARGET && terraform output cloudfront)
+    DISTRIBUTION_ID=$(cd infra/$TARGET && terraform output cloudfront | sed 's/"//g')
     set -x
     $AWS_EXECUTABLE cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID --paths "/index.html"
 fi
