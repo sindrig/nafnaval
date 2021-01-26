@@ -9,6 +9,10 @@ AWS_EXECUTABLE=${AWS_EXECUTABLE:-aws}
 
 if [[ "$AUTO_APPROVE_TF" == "true" ]]; then
     TERRAFORM_ARGS='-auto-approve'
+    (
+        cd infra/$TARGET
+        terraform plan
+    )
 else
     TERRAFORM_ARGS=''
 fi
