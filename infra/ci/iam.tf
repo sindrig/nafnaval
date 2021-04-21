@@ -23,7 +23,7 @@ module "iam-permissions" {
     ],
     [
       {
-        actions = ["iam:GetRole", "iam:ListAttachedRolePolicies"]
+        actions = ["iam:GetRole", "iam:ListAttachedRolePolicies", "iam:ListRolePolicies"]
         resources = [
           "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/lambda-execution-rolestaging",
           "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/lambda-execution-role",

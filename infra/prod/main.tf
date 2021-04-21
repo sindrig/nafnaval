@@ -23,12 +23,9 @@ terraform {
   }
 }
 
-resource "aws_acm_certificate" "certificate" {
-  provider          = aws.us
-  domain_name       = "*.nafnaval.is"
-  validation_method = "DNS"
-
-  subject_alternative_names = ["nafnaval.is"]
+data "aws_acm_certificate" "certificate" {
+  provider = aws.us
+  domain   = "*.nafnaval.is"
 }
 
 resource "aws_cloudfront_distribution" "www_distribution" {
@@ -74,7 +71,7 @@ resource "aws_cloudfront_distribution" "www_distribution" {
   }
 
   viewer_certificate {
-    acm_certificate_arn = aws_acm_certificate.certificate.arn
+    acm_certificate_arn = data.aws_acm_certificate.certificate.arn
     ssl_support_method  = "sni-only"
   }
 }
@@ -137,7 +134,7 @@ resource "aws_cloudfront_distribution" "root_distribution" {
   }
 
   viewer_certificate {
-    acm_certificate_arn = aws_acm_certificate.certificate.arn
+    acm_certificate_arn = data.aws_acm_certificate.certificate.arn
     ssl_support_method  = "sni-only"
   }
 }
@@ -201,7 +198,7 @@ output "root_cloudfront" {
 }
 
 output "certificate_arn" {
-  value = aws_acm_certificate.certificate.arn
+  value = data.aws_acm_certificate.certificate.arn
 }
 
 output "rest_api_id" {
