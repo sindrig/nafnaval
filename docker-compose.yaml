@@ -3,7 +3,7 @@ version: '2.1'
 services:
   localstack:
     container_name: localstack_main
-    image: localstack/localstack
+    image: "localstack/localstack:0.12.5"
     ports:
       - "4566:4566"
       - "8000:8000"

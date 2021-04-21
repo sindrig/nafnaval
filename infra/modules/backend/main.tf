@@ -223,7 +223,7 @@ resource "aws_api_gateway_deployment" "deployment" {
 
 module "gateway_cors" {
   source  = "bridgecrewio/apigateway-cors/aws"
-  version = "1.1.0"
+  version = "1.2.0"
 
   api       = aws_api_gateway_rest_api.gateway.id
   resources = [aws_api_gateway_resource.proxy.id]
