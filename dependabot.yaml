@@ -1,0 +1,32 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/frontend"
+    schedule:
+      interval: "daily"
+    labels:
+      - automerge
+      - dependencies
+    reviewers:
+      - sindrig
+
+  - package-ecosystem: "pip"
+    directory: "/backend"
+    schedule:
+      interval: "daily"
+    labels:
+      - automerge
+      - dependencies
+    reviewers:
+      - sindrig
+
+  # This might totally not do anything
+  - package-ecosystem: "terraform"
+    directory: "/infra"
+    schedule:
+      interval: "daily"
+    labels:
+      - automerge
+      - dependencies
+    reviewers:
+      - sindrig
