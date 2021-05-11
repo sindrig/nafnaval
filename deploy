@@ -7,6 +7,9 @@ AUTO_APPROVE_TF=${AUTO_APPROVE_TF:-false}
 CREATE_INVALIDATION=${CREATE_INVALIDATION:-true}
 AWS_EXECUTABLE=${AWS_EXECUTABLE:-aws}
 
+echo "TERRAFORM VERSION"
+terraform version
+
 if [[ "$AUTO_APPROVE_TF" == "true" ]]; then
     TERRAFORM_ARGS='-auto-approve'
     (
