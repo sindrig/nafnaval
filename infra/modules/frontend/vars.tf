@@ -1,5 +1,5 @@
 variable "base_url" {
-  type        = "string"
+  type        = string
   description = "Base url of the api"
 }
 
@@ -10,11 +10,11 @@ variable "write_local" {
 }
 
 variable "www_domain_name" {
-  type        = "string"
+  type        = string
   description = "www domain name of the bucket"
 }
 
 variable "root_domain_name" {
-  type        = "string"
+  type        = string
   description = "root domain name of the bucket"
 }
