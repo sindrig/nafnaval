@@ -37,9 +37,10 @@ resource "aws_lambda_function" "namelambda" {
 
   environment {
     variables = merge(
-      map(
-        "NAMES_TABLE", aws_dynamodb_table.names.name
-      ),
+      {
+        NAMES_TABLE = aws_dynamodb_table.names.name
+      }
+      ,
       var.lambda_environment
     )
   }
