@@ -133,7 +133,7 @@ jobs:
           cd bin
           curl -LO https://raw.github.com/robertpeteuil/terraform-installer/f5ea8c70b43492f6e98fa231122b0c07f305729d/terraform-install.sh
           chmod +x terraform-install.sh
-          ./terraform-install.sh -i 0.13.5 -c
+          ./terraform-install.sh -i $(cat ./.terraform-version) -c
           pwd >> $GITHUB_PATH
       - name: Set up Python
         uses: actions/setup-python@v2
