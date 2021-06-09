@@ -127,13 +127,15 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
+      - name: Set terraform version
+        run: echo "TERRAFORM_VERSION=$(cat ./.terraform-version)" >> $GITHUB_ENV
       - name: Install terraform
         run: |
           mkdir -p bin
           cd bin
           curl -LO https://raw.github.com/robertpeteuil/terraform-installer/f5ea8c70b43492f6e98fa231122b0c07f305729d/terraform-install.sh
           chmod +x terraform-install.sh
-          ./terraform-install.sh -i $(cat ./.terraform-version) -c
+          ./terraform-install.sh -i $TERRAFORM_VERSION -c
           pwd >> $GITHUB_PATH
       - name: Set up Python
         uses: actions/setup-python@v2
