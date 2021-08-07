@@ -87,7 +87,7 @@ async def main():
             f.write(
                 json.dumps(
                     sorted(
-                        [name.capitalize() for name in name_list],
+                        list({name.capitalize() for name in name_list}),
                         key=locale.strxfrm,
                     ),
                     indent=2,
