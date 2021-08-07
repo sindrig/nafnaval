@@ -20,6 +20,11 @@ jobs:
         with:
           python-version: 3.8
 
+      - name: is_IS.UTF-8
+        run: |
+            sudo locale-gen is_IS.UTF-8
+            sudo update-locale LANG=is_IS.UTF-8
+
       - name: Install dependencies
         run: pip install aiohttp
 
