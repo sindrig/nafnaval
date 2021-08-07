@@ -4,6 +4,7 @@ on:
   schedule:
     # Run at 12 every tuesday
     - cron: '0 12 * * 2'
+  workflow_dispatch:
 
 jobs:
   update:
