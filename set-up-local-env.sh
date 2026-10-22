@@ -4,6 +4,10 @@ set -exuo pipefail
 export AWS_ACCESS_KEY_ID=foo
 export AWS_SECRET_ACCESS_KEY=bar
 export AWS_REGION=eu-west-1
+# The legacy emulator does not support optional checksum trailers used by
+# current AWS CLI uploads. Keep this compatibility setting local-only.
+export AWS_REQUEST_CHECKSUM_CALCULATION=when_required
+export AWS_RESPONSE_CHECKSUM_VALIDATION=when_required
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 AWS_ACCESS_KEY_ID=foo

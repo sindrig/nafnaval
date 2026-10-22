@@ -72,6 +72,7 @@ jobs:
 
   integration:
     runs-on: ubuntu-24.04
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v7
         with:
@@ -103,6 +104,32 @@ jobs:
       - name: Start local environment
         run: make local-env
 
+      - name: Verify local frontend asset integrity
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from urllib.request import urlopen
+
+          root = Path('frontend/build')
+          checked = 0
+          for path in sorted(root.rglob('*')):
+              if not path.is_file() or path.name == 'env.json':
+                  continue
+              key = path.relative_to(root).as_posix()
+              with urlopen('http://localhost:8080/' + key, timeout=30) as response:
+                  actual = response.read()
+              expected = path.read_bytes()
+              assert actual == expected, (
+                  f'Corrupted local asset {key}: expected {len(expected)} bytes, '
+                  f'got {len(actual)}; tail={actual[-100:]!r}'
+              )
+              checked += 1
+          with urlopen('http://localhost:8080/env.json', timeout=30) as response:
+              assert json.load(response)['signupsEnabled'] is True
+          print(f'Verified {checked} frontend assets byte-for-byte')
+          PY
+
       - uses: actions/cache@v6
         with:
           path: |
@@ -123,6 +150,10 @@ jobs:
           install: false
         env:
           NODE_OPTIONS: ''
+
+      - name: Local service logs on failure
+        if: failure()
+        run: docker compose logs --no-color --tail=200
 
 
   deploy:
