@@ -71,8 +71,7 @@ jobs:
 
 
   integration:
-    # Cypress 5's bundled Electron requires the older Ubuntu system libraries.
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
         with:
