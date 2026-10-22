@@ -22,7 +22,7 @@ terraform {
     key     = "staging/terraform.tfstate"
   }
   required_providers {
-    aws = "~> 3.73.0"
+    aws = "~> 5.100.0"
   }
 }
 
@@ -166,6 +166,15 @@ module "nafnaval" {
   dynamo_table_name    = local.dynamo_table_name
   lambda_function_name = local.lambda_function_name
   iam_resource_suffix  = "staging"
+  signups_enabled      = true
+  frontend_url         = "https://${local.www_domain_name}"
+}
+
+module "signup_protection" {
+  source    = "../modules/signup-protection"
+  name      = local.lambda_function_name
+  stage_arn = module.nafnaval.stage_arn
+  domains   = [local.www_domain_name, local.root_domain_name]
 }
 
 module "frontend" {
@@ -173,6 +182,8 @@ module "frontend" {
   base_url         = module.nafnaval.base_url
   www_domain_name  = local.www_domain_name
   root_domain_name = local.root_domain_name
+  signups_enabled  = true
+  signup_captcha   = module.signup_protection.captcha
 }
 
 output "base_url" {

@@ -21,7 +21,11 @@ module "nafnaval" {
   source               = "../modules/backend"
   dynamo_table_name    = "dev-nafnaval-names"
   lambda_function_name = "dev-nafnaval-api-lambda"
-  iam_resource_suffix  = "dev"
+  # The legacy, local-only LocalStack image does not support Python 3.12.
+  lambda_runtime      = "python3.8"
+  iam_resource_suffix = "dev"
+  signups_enabled     = true
+  frontend_url        = "http://localhost:8080"
   lambda_environment = {
     LOCALSTACK = "true"
   }
@@ -34,6 +38,7 @@ module "frontend" {
   www_domain_name  = "nafnaval"
   root_domain_name = "root-nafnaval"
   write_local      = true
+  signups_enabled  = true
 }
 
 locals {

@@ -18,3 +18,16 @@ variable "root_domain_name" {
   type        = string
   description = "root domain name of the bucket"
 }
+
+variable "signups_enabled" {
+  type    = bool
+  default = false
+}
+
+variable "signup_captcha" {
+  type = object({
+    scriptUrl = string
+    apiKey    = string
+  })
+  default = null
+}

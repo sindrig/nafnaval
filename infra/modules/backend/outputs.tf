@@ -17,3 +17,7 @@ output "source_code" {
 output "source_code_bucket" {
   value = aws_s3_bucket.lambdaholder.id
 }
+
+output "stage_arn" {
+  value = "${aws_api_gateway_rest_api.gateway.arn}/stages/${aws_api_gateway_deployment.deployment.stage_name}"
+}

@@ -58,6 +58,7 @@ export default function nameReducer(
       return {
         ...state,
         initializing: true,
+        error: null,
       }
     case ActionTypes.GET_NAMES_DONE:
       const newStateGetNames = {
@@ -93,8 +94,12 @@ export default function nameReducer(
     case ActionTypes.SIGNUP_DONE:
       return {
         ...state,
+        initializing: false,
+        error: null,
         stateId: action.payload.stateId,
       }
+    case ActionTypes.CLEAR_ERROR:
+      return { ...state, error: null }
     case ActionTypes.ERROR:
       return {
         ...state,

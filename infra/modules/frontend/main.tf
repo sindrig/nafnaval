@@ -1,9 +1,9 @@
 locals {
-  env_content = <<CONTENT
-{
-  "baseURL": "${var.base_url}"
-}
-CONTENT
+  env_content = jsonencode({
+    baseURL        = var.base_url
+    signupsEnabled = var.signups_enabled
+    signupCaptcha  = var.signup_captcha
+  })
 }
 
 resource "aws_s3_bucket" "www" {
@@ -66,5 +66,6 @@ resource "aws_s3_bucket_object" "object" {
   key     = "env.json"
   content = local.env_content
 
-  content_type = "application/json"
+  content_type  = "application/json"
+  cache_control = "no-store"
 }

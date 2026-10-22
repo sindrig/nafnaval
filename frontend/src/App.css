@@ -11,3 +11,8 @@
 .app-container > div {
   height: 100%;
 }
+
+.error-banner {
+  padding-top: 16px;
+  padding-bottom: 16px;
+}

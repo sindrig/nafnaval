@@ -19,6 +19,7 @@ class BaseHandler:
             endpoint_url = f'http://{localstack_hostname}:4566'
             resource_kwargs['endpoint_url'] = endpoint_url
         dynamodb = boto3.resource('dynamodb', **resource_kwargs)
+        self.dynamodb_client = boto3.client('dynamodb', **resource_kwargs)
         self.name_table = dynamodb.Table(os.getenv('NAMES_TABLE'))
         self.ses_client = boto3.client('ses', **resource_kwargs)
 

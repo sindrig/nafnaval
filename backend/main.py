@@ -10,6 +10,9 @@ def handler(event, context):
         path=event.get('path', '').lstrip('/'),
         method=event.get('httpMethod', '').lower(),
         body=event.get('body'),
+        source_ip=event.get('requestContext', {})
+        .get('identity', {})
+        .get('sourceIp'),
     )
 
 

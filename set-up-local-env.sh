@@ -4,6 +4,10 @@ set -exuo pipefail
 export AWS_ACCESS_KEY_ID=foo
 export AWS_SECRET_ACCESS_KEY=bar
 export AWS_REGION=eu-west-1
+# The legacy emulator does not support optional checksum trailers used by
+# current AWS CLI uploads. Keep this compatibility setting local-only.
+export AWS_REQUEST_CHECKSUM_CALCULATION=when_required
+export AWS_RESPONSE_CHECKSUM_VALIDATION=when_required
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 AWS_ACCESS_KEY_ID=foo
@@ -11,9 +15,15 @@ AWS_SECRET_ACCESS_KEY=bar
 ENDPOINT=http://localhost:4566
 export AWS_EXECUTABLE="aws --endpoint=$ENDPOINT"
 
-docker-compose down -v
+if docker compose version >/dev/null 2>&1; then
+    COMPOSE=(docker compose)
+else
+    COMPOSE=(docker-compose)
+fi
+
+"${COMPOSE[@]}" down -v
 rm -f infra/dev/terraform.tfstate
-docker-compose up -d
+"${COMPOSE[@]}" up -d
 
 while ! $AWS_EXECUTABLE s3 ls; do
     sleep 0.1
