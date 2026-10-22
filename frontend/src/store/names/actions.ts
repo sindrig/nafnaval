@@ -25,11 +25,12 @@ export function signUp(
   email1: string,
   email2: string,
   gender: string,
+  captchaToken?: string,
 ): (dispatch: Dispatch<NameActionTypes>) => Promise<void> {
   return async (dispatch: Dispatch<NameActionTypes>) => {
     dispatch({ type: ActionTypes.LOADING_NAMES })
 
-    const payload = await createState(email1, email2, gender)
+    const payload = await createState(email1, email2, gender, captchaToken)
     if ((payload as ErrorResponse).error) {
       dispatch(receiveError(payload as ErrorResponse))
     } else {
@@ -40,6 +41,10 @@ export function signUp(
       })
     }
   }
+}
+
+export function clearError(): NameActionTypes {
+  return { type: ActionTypes.CLEAR_ERROR }
 }
 
 export function moveName(

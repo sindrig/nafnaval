@@ -1,5 +1,6 @@
 locals {
-  code_path = "${path.module}/../../../dist/code.zip"
+  code_path       = "${path.module}/../../../dist/code.zip"
+  gateway_headers = ["X-Aws-Waf-Token"]
 }
 
 resource "aws_s3_bucket" "lambdaholder" {
@@ -15,6 +16,12 @@ resource "aws_s3_bucket_object" "code" {
   source = local.code_path
 
   etag = filemd5(local.code_path)
+
+  lifecycle {
+    # The content-addressed key controls replacement. Multipart upload ETags
+    # are not file MD5 hashes and would otherwise cause perpetual updates.
+    ignore_changes = [etag]
+  }
 }
 
 resource "aws_lambda_function" "namelambda" {
@@ -24,7 +31,7 @@ resource "aws_lambda_function" "namelambda" {
   function_name = var.lambda_function_name
 
   handler = "main.handler"
-  runtime = "python3.8"
+  runtime = var.lambda_runtime
   role    = aws_iam_role.lambda_exec.arn
 
   reserved_concurrent_executions = -1
@@ -38,7 +45,10 @@ resource "aws_lambda_function" "namelambda" {
   environment {
     variables = merge(
       {
-        NAMES_TABLE = aws_dynamodb_table.names.name
+        NAMES_TABLE         = aws_dynamodb_table.names.name
+        FRONTEND_URL        = var.frontend_url
+        SIGNUP_LIMITS_TABLE = aws_dynamodb_table.signup_limits.name
+        SIGNUPS_ENABLED     = tostring(var.signups_enabled)
       }
       ,
       var.lambda_environment
@@ -95,20 +105,21 @@ resource "aws_iam_policy" "lambda_dynamo" {
   path        = "/"
   description = "IAM policy for dynamodb from a lambda"
 
-  policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": [
-        "dynamodb:*"
-      ],
-      "Resource": ["${aws_dynamodb_table.names.arn}"],
-      "Effect": "Allow"
-    }
-  ]
-}
-EOF
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action   = ["dynamodb:*"]
+        Resource = [aws_dynamodb_table.names.arn]
+        Effect   = "Allow"
+      },
+      {
+        Action   = ["dynamodb:PutItem", "dynamodb:UpdateItem"]
+        Resource = [aws_dynamodb_table.signup_limits.arn]
+        Effect   = "Allow"
+      },
+    ]
+  })
 }
 
 resource "aws_iam_policy" "lambda_ses" {
@@ -216,7 +227,16 @@ resource "aws_api_gateway_deployment" "deployment" {
   depends_on = [
     aws_api_gateway_integration.lambda,
     aws_api_gateway_integration.lambda_root,
+    module.gateway_cors,
   ]
+
+  triggers = {
+    cors_headers = sha1(jsonencode(local.gateway_headers))
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
 
   rest_api_id = aws_api_gateway_rest_api.gateway.id
   stage_name  = "stage"
@@ -229,6 +249,7 @@ module "gateway_cors" {
   resources = [aws_api_gateway_resource.proxy.id]
 
   methods = ["GET", "POST", "PUT"]
+  headers = local.gateway_headers
 
   depends_on = [aws_api_gateway_rest_api.gateway, aws_api_gateway_resource.proxy]
 }
@@ -250,5 +271,21 @@ resource "aws_dynamodb_table" "names" {
   attribute {
     name = "StateId"
     type = "S"
+  }
+}
+
+resource "aws_dynamodb_table" "signup_limits" {
+  name         = "${var.dynamo_table_name}-signup-limits"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "LimitKey"
+
+  attribute {
+    name = "LimitKey"
+    type = "S"
+  }
+
+  ttl {
+    attribute_name = "ExpiresAt"
+    enabled        = true
   }
 }

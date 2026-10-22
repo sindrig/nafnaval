@@ -10,11 +10,14 @@ import botocore
 
 from server.handlers.base import BaseHandler
 from server.responses import response
-from server.exceptions import NotFound, BadInput
+from server.exceptions import NotFound, BadInput, ServiceUnavailable
+from server.signup_limits import SignupLimits
 from server import names
 
 TEMPLATE_DIR = os.path.dirname(os.path.abspath(__file__))
-STUPID_EMAIL_REGEX = re.compile(r'[^@]+@[^@]+\.[^@]+')
+EMAIL_REGEX = re.compile(
+    r"[a-z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-z0-9.-]+\.[a-z]{2,}"
+)
 FRONTEND_URL = 'https://nafnaval.is'
 EMAIL_SENDER = 'nafnaval@nafnaval.is'
 
@@ -26,14 +29,26 @@ class StateHandler(BaseHandler):
         return response(self._serializable(state))
 
     def put(self, request):
+        if os.getenv('SIGNUPS_ENABLED') != 'true':
+            raise ServiceUnavailable(
+                'Signups are temporarily paused. '
+                'Existing lists are still available.'
+            )
+        if not isinstance(request.body, dict):
+            raise BadInput('Expected a JSON object')
         email1 = self._get_and_validate_email(request.body, 'email1')
         email2 = self._get_and_validate_email(request.body, 'email2')
+        if email1 == email2:
+            raise BadInput('Use two different email addresses')
         gender = request.body.get('gender')
         if gender not in (names.MALE, names.FEMALE, names.BOTH):
             raise BadInput(
                 'Missing or invalid gender (either '
                 f'"{names.MALE}", "{names.FEMALE}" or "{names.BOTH}")'
             )
+        SignupLimits(
+            self.dynamodb_client, os.getenv('SIGNUP_LIMITS_TABLE')
+        ).reserve(request.source_ip, [email1, email2])
         name_list = names.get(gender)
         state_id = str(uuid.uuid4())
         counterpart = str(uuid.uuid4())
@@ -152,11 +167,19 @@ class StateHandler(BaseHandler):
         if key not in body:
             raise BadInput(f'Missing {key}')
         email = body[key]
-        if not STUPID_EMAIL_REGEX.match(email):
+        if not isinstance(email, str):
+            raise BadInput(f'Invalid email "{email}"')
+        email = email.strip().lower()
+        if (
+            len(email) > 254
+            or not EMAIL_REGEX.fullmatch(email)
+            or len(email.split('@')[0]) > 64
+        ):
             raise BadInput(f'Invalid email "{email}"')
         return email
 
     def _send_email(self, email, state_id, template):
+        frontend_url = os.getenv('FRONTEND_URL', FRONTEND_URL)
         response = self.ses_client.send_email(
             Source=EMAIL_SENDER,
             Destination={'ToAddresses': [email]},
@@ -165,7 +188,7 @@ class StateHandler(BaseHandler):
                 'Body': {
                     'Html': {
                         'Data': template
-                        % {'url': urljoin(FRONTEND_URL, state_id)}
+                        % {'url': urljoin(frontend_url, state_id)}
                     }
                 },
             },

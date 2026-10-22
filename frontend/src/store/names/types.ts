@@ -42,6 +42,7 @@ interface ErrorType {
 export enum ActionTypes {
   GET_NAMES = 'GET_NAMES',
   ERROR = 'ERROR',
+  CLEAR_ERROR = 'CLEAR_ERROR',
   LOADING_NAMES = 'LOADING_NAMES',
   GET_NAMES_DONE = 'GET_NAMES_DONE',
   SIGNUP_DONE = 'SIGNUP_DONE',
@@ -63,6 +64,10 @@ interface GetNamesStarted {
 interface Error {
   type: typeof ActionTypes.ERROR
   payload: ErrorType
+}
+
+interface ClearError {
+  type: typeof ActionTypes.CLEAR_ERROR
 }
 
 interface GetNamesDone {
@@ -92,4 +97,5 @@ export type NameActionTypes =
   | NameSelected
   | SignupDone
   | Error
+  | ClearError
   | UndoMovements

@@ -2,29 +2,32 @@ name: CI/CD
 
 on:
   push:
-  create:
   workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  NODE_OPTIONS: --openssl-legacy-provider
 
 jobs:
   frontend:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
-      - uses: actions/cache@v2
-        name: Node modules cache
-        id: node-modules
+      - uses: actions/setup-node@v7
         with:
-          path: '**/node_modules'
-          key: ${{ runner.os }}-modules-${{ hashFiles('frontend/yarn.lock') }}
+          node-version: '22'
+          cache: yarn
+          cache-dependency-path: frontend/yarn.lock
 
       - name: Install yarn packages
-        if: steps.node-modules.outputs.cache-hit != 'true'
         run: |
           cd frontend
-          yarn install
+          yarn install --frozen-lockfile
 
       - name: Prettier frontend
         run: |
@@ -34,20 +37,24 @@ jobs:
       - name: Test frontend
         run: |
           cd frontend
-          yarn test --ci
+          yarn test --ci --watchAll=false --runInBand
+
+      - name: Type check frontend
+        run: yarn tsc --noEmit
+        working-directory: ./frontend
 
 
   backend:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v7
         with:
-          python-version: 3.8
+          python-version: '3.12'
 
       - name: Install dependencies
         run: pip install -r backend/requirements.txt -r backend/test-requirements.txt
@@ -64,26 +71,31 @@ jobs:
 
 
   integration:
-    runs-on: ubuntu-20.04
+    # Cypress 5's bundled Electron requires the older Ubuntu system libraries.
+    runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v7
         with:
-          python-version: 3.8
+          python-version: '3.12'
 
       - name: Install virtualenv
         run: pip install virtualenv
 
-      - uses: actions/cache@v2
-        name: Node modules cache
-        id: node-modules
+      - uses: actions/setup-node@v7
         with:
-          path: '**/node_modules'
-          key: ${{ runner.os }}-modules-${{ hashFiles('frontend/yarn.lock') }}
+          node-version: '22'
+          cache: yarn
+          cache-dependency-path: frontend/yarn.lock
+
+      - uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: 1.1.7
+          terraform_wrapper: false
 
       # TODO: Re-use built artifacts for staging+prod?
       - name: Build
@@ -92,7 +104,7 @@ jobs:
       - name: Start local environment
         run: make local-env
 
-      - uses: actions/cache@v2
+      - uses: actions/cache@v6
         with:
           path: |
             ~/.cache/Cypress
@@ -101,46 +113,49 @@ jobs:
 
       - run: npx cypress install
         working-directory: ./frontend
+        env:
+          NODE_OPTIONS: ''
 
       - name: Cypress run dev
-        uses: cypress-io/github-action@v2
+        uses: cypress-io/github-action@v7
         with:
           working-directory: ./frontend
-          record: true
+          record: false
           install: false
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+          NODE_OPTIONS: ''
 
 
   deploy:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
 
     needs:
       - backend
       - frontend
       - integration
 
-    if: github.ref == 'refs/heads/main'
+    # Leave disabled until the CI principal can manage the new AWS protections.
+    if: github.ref == 'refs/heads/main' && vars.AWS_DEPLOYMENTS_ENABLED == 'true'
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Set terraform version
         run: echo "TERRAFORM_VERSION=$(cat ./.terraform-version)" >> $GITHUB_ENV
-      - name: Install terraform
-        run: |
-          mkdir -p bin
-          cd bin
-          curl -LO https://raw.github.com/robertpeteuil/terraform-installer/f5ea8c70b43492f6e98fa231122b0c07f305729d/terraform-install.sh
-          chmod +x terraform-install.sh
-          ./terraform-install.sh -i $TERRAFORM_VERSION -c
-          pwd >> $GITHUB_PATH
-      - name: Set up Python
-        uses: actions/setup-python@v2
+      - uses: hashicorp/setup-terraform@v4
         with:
-          python-version: 3.8
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+          terraform_wrapper: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: yarn
+          cache-dependency-path: frontend/yarn.lock
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
 
       - name: Install virtualenv
         run: pip install virtualenv
@@ -158,14 +173,14 @@ jobs:
 
 
       - name: Cypress run staging
-        uses: cypress-io/github-action@v2
+        uses: cypress-io/github-action@v7
         with:
           config: baseUrl=https://stagingwww.nafnaval.is
+          spec: cypress/smoke/protected-signup.spec.js
           working-directory: ./frontend
-          record: true
+          record: false
         env:
-          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_OPTIONS: ''
 
       - name: Deploy prod
         env:

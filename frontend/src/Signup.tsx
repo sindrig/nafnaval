@@ -1,11 +1,13 @@
-import React, { useState } from 'react'
-import { connect, ConnectedProps } from 'react-redux'
+import React, { useEffect, useRef, useState } from 'react'
+import { connect } from 'react-redux'
 import { Redirect } from 'react-router'
 import { Dispatch, Action, bindActionCreators } from 'redux'
-import { signUp as signUpAction } from './store/names/actions'
+import { clearError, signUp as signUpAction } from './store/names/actions'
 import { IStoreState } from './store/reducer'
 import useForm from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
+import { getSignupConfig } from './api'
+import { CaptchaConfig, renderSignupCaptcha } from './wafCaptcha'
 
 import Button from '@material-ui/core/Button'
 import TextField from '@material-ui/core/TextField'
@@ -38,19 +40,26 @@ const useStyles = makeStyles((theme) => ({
 function mapDispatchToProps(dispatch: Dispatch<Action>) {
   return {
     signUp: bindActionCreators(signUpAction, dispatch),
+    clearError: bindActionCreators(clearError, dispatch),
   }
 }
 
-function mapStateToProps({ names: { stateId } }: IStoreState) {
-  return { stateId }
+function mapStateToProps({ names: { stateId, initializing } }: IStoreState) {
+  return { stateId, initializing }
 }
 
 const connector = connect(mapStateToProps, mapDispatchToProps)
 
-type PropsFromRedux = ConnectedProps<typeof connector>
-type Props = PropsFromRedux & {
-  signUp: Function
+type Props = {
+  signUp: (
+    email1: string,
+    email2: string,
+    gender: string,
+    captchaToken?: string,
+  ) => void
   stateId?: string
+  initializing: boolean
+  clearError: () => void
 }
 
 interface SignupForm {
@@ -58,13 +67,73 @@ interface SignupForm {
   email2: string
 }
 
-const Signup: React.FC<Props> = ({ signUp, stateId }: Props) => {
+export const Signup: React.FC<Props> = ({
+  signUp,
+  stateId,
+  initializing,
+  clearError,
+}: Props) => {
   const [gender, setGender] = useState('female')
+  const [config, setConfig] = useState<{
+    enabled: boolean
+    captcha: CaptchaConfig | null
+  } | null>(null)
+  const [error, setError] = useState(false)
+  const [verifying, setVerifying] = useState(false)
+  const [captchaKey, setCaptchaKey] = useState(0)
+  const captchaContainer = useRef<HTMLDivElement>(null)
   const { register, handleSubmit } = useForm<SignupForm>()
   const { t } = useTranslation()
   const classes = useStyles()
+  useEffect(() => {
+    let active = true
+    getSignupConfig()
+      .then((config) => {
+        if (active) setConfig(config)
+      })
+      .catch(() => {
+        if (active) setError(true)
+      })
+    return () => {
+      active = false
+    }
+  }, [])
+
   const onSubmit = ({ email1, email2 }: SignupForm) => {
-    signUp(email1, email2, gender)
+    if (!config || !config.enabled || verifying || initializing) return
+    clearError()
+    setError(false)
+    if (!config.captcha) {
+      // Only the explicitly configured local environment omits CAPTCHA.
+      // Deployed APIs independently require a WAF-verified token.
+      signUp(email1, email2, gender)
+      return
+    }
+    const container = captchaContainer.current
+    if (!container) return
+    setVerifying(true)
+    let completed = false
+    const finishVerification = () => {
+      if (completed || !container.isConnected) return false
+      completed = true
+      setVerifying(false)
+      // Remove vendor success/redirect content and detach stale callbacks.
+      setCaptchaKey((key) => key + 1)
+      return true
+    }
+    const onError = () => {
+      if (finishVerification()) setError(true)
+    }
+    renderSignupCaptcha(
+      container,
+      config.captcha,
+      (token) => {
+        if (finishVerification()) {
+          signUp(email1, email2, gender, token)
+        }
+      },
+      onError,
+    ).catch(onError)
   }
   if (stateId) {
     return <Redirect to={`/${stateId}`} />
@@ -75,6 +144,18 @@ const Signup: React.FC<Props> = ({ signUp, stateId }: Props) => {
         <Typography component="h1" variant="h5">
           {t('Sign up')}
         </Typography>
+        {config && !config.enabled && (
+          <Typography role="status">
+            {t(
+              'Signups are temporarily paused. Existing lists are still available.',
+            )}
+          </Typography>
+        )}
+        {error && (
+          <Typography role="alert" color="error">
+            {t('Verification is unavailable. Please try again later.')}
+          </Typography>
+        )}
         <form onSubmit={handleSubmit(onSubmit)} className={classes.form}>
           <Grid container spacing={2}>
             <Grid item xs={12}>
@@ -101,6 +182,13 @@ const Signup: React.FC<Props> = ({ signUp, stateId }: Props) => {
                 type="email"
                 inputRef={register}
                 inputProps={{ 'data-testid': 'partner-email-input' }}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <div
+                key={captchaKey}
+                ref={captchaContainer}
+                hidden={!verifying}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -137,6 +225,9 @@ const Signup: React.FC<Props> = ({ signUp, stateId }: Props) => {
                 variant="contained"
                 color="primary"
                 className={classes.submit}
+                disabled={
+                  !config || !config.enabled || verifying || initializing
+                }
               >
                 {t('Submit')}
               </Button>

@@ -21,3 +21,11 @@ class BadInput(HttpError):
 
 class MethodNotAllowed(HttpError):
     status_code = 405
+
+
+class TooManyRequests(HttpError):
+    status_code = 429
+
+
+class ServiceUnavailable(HttpError):
+    status_code = 503

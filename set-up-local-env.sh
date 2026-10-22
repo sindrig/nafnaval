@@ -11,9 +11,15 @@ AWS_SECRET_ACCESS_KEY=bar
 ENDPOINT=http://localhost:4566
 export AWS_EXECUTABLE="aws --endpoint=$ENDPOINT"
 
-docker-compose down -v
+if docker compose version >/dev/null 2>&1; then
+    COMPOSE=(docker compose)
+else
+    COMPOSE=(docker-compose)
+fi
+
+"${COMPOSE[@]}" down -v
 rm -f infra/dev/terraform.tfstate
-docker-compose up -d
+"${COMPOSE[@]}" up -d
 
 while ! $AWS_EXECUTABLE s3 ls; do
     sleep 0.1

@@ -1,4 +1,4 @@
-import { render, fireEvent } from '@testing-library/react'
+import { render, wait } from '@testing-library/react'
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 import React from 'react'
 import { Provider } from 'react-redux'
@@ -7,11 +7,9 @@ import { setupServer } from 'msw/node'
 import App from './App'
 import store from './store'
 
-require('mutationobserver-shim')
-
 const server = setupServer(
-  rest.post('/api/login', (req, res, ctx) => {
-    return res(ctx.json({ token: 'fake_user_token' }))
+  rest.get('/env.json', (req, res, ctx) => {
+    return res(ctx.json({ baseURL: '/api', signupsEnabled: false }))
   }),
 )
 
@@ -21,8 +19,8 @@ afterEach(() => {
 })
 afterAll(() => server.close())
 
-test('logs in', () => {
-  const { getByTestId, getByText } = render(
+test('paused registration does not prevent loading the app', async () => {
+  const { getByRole, getByText } = render(
     <MuiThemeProvider>
       <Provider store={store}>
         <App />
@@ -30,13 +28,6 @@ test('logs in', () => {
     </MuiThemeProvider>,
   )
 
-  fireEvent.change(getByTestId('your-email-input'), {
-    target: { value: 'tester@nafnaval.is' },
-  })
-
-  fireEvent.change(getByTestId('partner-email-input'), {
-    target: { value: 'tester2@nafnaval.is' },
-  })
-  fireEvent.click(getByTestId('male-radio'))
-  fireEvent.click(getByText('Submit'))
+  await wait(() => expect(getByRole('status')).toBeInTheDocument())
+  expect(getByText('Submit').closest('button')).toBeDisabled()
 })

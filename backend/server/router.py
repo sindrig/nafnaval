@@ -11,7 +11,7 @@ def get_handler(key):
     return {'state': StateHandler, 'compare': CompareHandler}.get(key, None)
 
 
-def serve(path, method, body=None):
+def serve(path, method, body=None, source_ip=None):
     try:
         try:
             handler_key, rest = path.split('/', 1)
@@ -30,9 +30,11 @@ def serve(path, method, body=None):
                 body = json.loads(body)
             except ValueError:
                 raise BadInput('Could not decode body')
+            if not isinstance(body, dict):
+                raise BadInput('Expected a JSON object')
         parts = urlparse(rest)
         return getattr(target_handler(), method)(
-            Request(path=parts.path, body=body)
+            Request(path=parts.path, body=body, source_ip=source_ip)
         )
     except HttpError as e:
         return response(e.data(), status_code=e.status_code)

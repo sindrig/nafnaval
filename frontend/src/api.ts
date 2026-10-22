@@ -11,6 +11,14 @@ const getEnv = async () => {
   return envCache
 }
 
+export const getSignupConfig = async () => {
+  const env = await getEnv()
+  return {
+    enabled: env.signupsEnabled === true,
+    captcha: env.signupCaptcha || null,
+  }
+}
+
 const getApiClient = async () => {
   const { baseURL } = await getEnv()
   return axios.create({
@@ -100,19 +108,26 @@ export const createState = async (
   email1: string,
   email2: string,
   gender: string,
+  captchaToken?: string,
 ): Promise<CreateStateResponse | ErrorResponse> => {
   try {
     const apiClient = await getApiClient()
-    const response = await apiClient.put<CreateStateResponse>(`/state/`, {
-      email1,
-      email2,
-      gender,
-    })
+    const response = await apiClient.put<CreateStateResponse>(
+      `/state/`,
+      { email1, email2, gender },
+      captchaToken ? { headers: { 'X-Aws-Waf-Token': captchaToken } } : {},
+    )
     return response.data
   } catch (err) {
-    if (err && err.response) {
+    if (
+      err &&
+      err.response &&
+      err.response.data &&
+      typeof err.response.data.error === 'string'
+    ) {
       return err.response.data
     }
-    throw err
+    // WAF CAPTCHA/block responses might not include CORS headers or JSON.
+    return { error: 'Signup could not be completed. Please try again.' }
   }
 }

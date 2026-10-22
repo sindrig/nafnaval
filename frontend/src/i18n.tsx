@@ -8,6 +8,15 @@ const resources = {
       'Your e-mail': 'Your e-mail',
       'Partner e-mail': 'Partner e-mail',
       'Sign up': 'Sign up',
+      'Signups are temporarily paused. Existing lists are still available.':
+        'Signups are temporarily paused. Existing lists are still available.',
+      'Verification is unavailable. Please try again later.':
+        'Verification is unavailable. Please try again later.',
+      'Too many signups. Please try again later.':
+        'Too many signups. If you recently signed up, use the links in your email. Each email address can only be used once every 24 hours. Otherwise, please try again later.',
+      'Signup could not be completed. Please try again.':
+        'Signup could not be completed. Please try again.',
+      Dismiss: 'Dismiss',
       Submit: 'Submit',
       Male: 'Boy',
       Both: 'Both',
@@ -31,6 +40,15 @@ const resources = {
       'Your e-mail': 'Þinn tölvupóstur',
       'Partner e-mail': 'Tölvupóstur maka',
       'Sign up': 'Nýskráning',
+      'Signups are temporarily paused. Existing lists are still available.':
+        'Nýskráningar eru tímabundið lokaðar. Eldri nafnalistar eru enn aðgengilegir.',
+      'Verification is unavailable. Please try again later.':
+        'Ekki tókst að staðfesta skráningu. Vinsamlegast reyndu aftur síðar.',
+      'Too many signups. Please try again later.':
+        'Of margar nýskráningar. Ef þú skráðir þig nýlega skaltu nota hlekkina í tölvupóstinum þínum. Aðeins er hægt að nota hvert netfang einu sinni á 24 klukkustunda fresti. Annars skaltu reyna aftur síðar.',
+      'Signup could not be completed. Please try again.':
+        'Ekki tókst að ljúka skráningu. Vinsamlegast reyndu aftur.',
+      Dismiss: 'Loka',
       Submit: 'Byrja!',
       Male: 'Drengur',
       Both: 'Bæði',
